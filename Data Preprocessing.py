@@ -1,9 +1,8 @@
 import pandas as pd
 import numpy as np 
 import matplotlib.pyplot as plt
-
 import yfinance as yf
-from yahoofinancials import YahooFinancials
+import performanceanalytics.table.table as pat
 
 ''' Import stock symbols as well as company name '''
 stock_data = pd.read_csv('Companies_Ticker.csv', sep = ';')
@@ -27,13 +26,57 @@ for s in stock_data['Symbol']: # iterate for every stock indices
 # Concatenate all data
 stocks_as_df = pd.concat(stock_dict, axis = 0)
 
-''' Transform daily data to weekly 
+''' Transform daily price data to daily returns
 Parameters
 ----------
 :stock_weekly:  dictionary
-    Contains the stock symbols as key and the weekly adj. closing prices as values.
+    Contains the stock symbols as key and the weekly returns as values.
 -------
 '''
-stock_weekly = {}
+returns_daily = {}
 for s in stock_data['Symbol']:
-    stock_weekly[s] = stock_dict[s]['Adj Close'].resample("W").mean()
+    returns_daily[s] = stock_dict['ADS.DE']['Adj Close'].pct_change()
+
+''' Transform daily price data to weekly returns
+Parameters
+----------
+:stock_weekly:  dictionary
+    Contains the stock symbols as key and the weekly returns as values.
+-------
+'''
+returns_weekly = {}
+for s in stock_data['Symbol']:
+    returns_weekly[s] = stock_dict[s]['Adj Close'].resample('W').ffill().pct_change()
+
+''' Calculating measures of location, statistical dispersion and shape
+Parameters
+----------
+:des_stat:  dataframe
+    Contains the descriptive statistics.
+-------
+'''
+
+des_stat = pd.DataFrame(columns=stock_data['Symbol'], 
+                        index=['Observations', 'NAs', 'Minimum', 'Quartile 1', 'Median', 
+                               'Artithmetic Mean', 'Geometric Mean', 'Quartile 3', 'Maximum', 'SE Mean',
+                               'LCL Mean (.95)', 'UCL Mean (.95)', 'Variance', 'Stdev', 'Skewness','Kurtosis'])
+
+for s in stock_data['Symbol']:
+    df = pd.DataFrame(returns_daily[s])
+    des_stat[s] = pat.stats_table(df, manager_col=0)
+
+''' Calculating the downside statistics
+Parameters
+----------
+:down_stat:  dataframe
+    Contains the downside statistics.
+-------
+'''
+down_stat = pd.DataFrame(columns=stock_data['Symbol'], 
+                        index=['Semi Deviation', 'Gain Deviation', 'Loss Deviation', 'Downside Deviation (MAR=2.0%)',
+                               'Downside Deviation (rf=0.5%)', 'Downside Deviation (0%)', 'Maximum Drawdown', 
+                               'Historical VaR (95%)', 'Historical ES (95%)', 'Modified VaR (95%)', 'Modified ES (95%)'])
+
+for s in stock_data['Symbol']:
+    df = pd.DataFrame(returns_daily[s])
+    down_stat[s] = pat.create_downside_table(df,0)‚
