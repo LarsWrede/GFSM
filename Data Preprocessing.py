@@ -35,7 +35,7 @@ Parameters
 '''
 returns_daily = {}
 for s in stock_data['Symbol']:
-    returns_daily[s] = stock_dict['ADS.DE']['Adj Close'].pct_change()
+    returns_daily[s] = stock_dict[s]['Adj Close'].pct_change()
 
 ''' Transform daily price data to weekly returns
 Parameters
@@ -64,6 +64,7 @@ des_stat = pd.DataFrame(columns=stock_data['Symbol'],
 for s in stock_data['Symbol']:
     df = pd.DataFrame(returns_daily[s])
     des_stat[s] = pat.stats_table(df, manager_col=0)
+print(des_stat)
 
 ''' Calculating the downside statistics
 Parameters
@@ -79,4 +80,5 @@ down_stat = pd.DataFrame(columns=stock_data['Symbol'],
 
 for s in stock_data['Symbol']:
     df = pd.DataFrame(returns_daily[s])
-    down_stat[s] = pat.create_downside_table(df,0)‚
+    down_stat[s] = pat.create_downside_table(df,0)
+print(down_stat)
