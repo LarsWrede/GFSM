@@ -135,4 +135,4 @@ for s in stock_data['Symbol']:
     down_stat[s] = pat.create_downside_table(df,0)
 print(down_stat)
 
-
+# test
