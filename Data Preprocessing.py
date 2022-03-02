@@ -46,7 +46,7 @@ stocks_as_df_has_nan = np.isnan(np.sum(stocks_as_df))
 
 stocks_as_df_Volume_is_0 = stocks_as_df.loc[stocks_as_df["Volume"] == 0]
 
-''' Check if Adj Close in stocks_as_df differs from previous/ followingg day.
+''' Check if Adj Close in stocks_as_df differs from previous/ following day.
 ----------
 :stocks_as_df:  dataframe
     Contains the time series data as one df.
@@ -139,5 +139,3 @@ for s in stock_data['Symbol']:
     df = pd.DataFrame(returns_daily[s])
     down_stat[s] = pat.create_downside_table(df, 0)
 print(down_stat)
-
-# test, another test
