@@ -28,15 +28,21 @@ announcements['Date'] = pd.to_datetime(announcements['Date'])
 info_df = info_df.join(announcements.set_index('Date')['Announcement'], on='Date')
 info_df['Announcement'] = pd.to_datetime(info_df['Announcement'])
 
+unique_stocks = list(dict.fromkeys(list(info_df.loc[~info_df['Type'].isnull()]['Symbol'])))
+
+#here map reuters -> yahoo
+
+info_df.to_csv('/Users/dennisblaufuss/Desktop/Uni/Repos/GFSM/01_Data & Preprocessing/info_df.csv')
+
 """Creating StockData DataFrame
 * All data is retrieved via Reuters.
 * Close allways referrs to adjusted close.
 * Dates are formatted in pandas datetime format and used as index.
 """
 
-stockdata = pd.read_csv('https://raw.githubusercontent.com/LarsWrede/GFSM/main/01_Data%20%26%20Preprocessing/stocks-historical-data.csv', sep=';')[1:]
+stockdata_df = pd.read_csv('https://raw.githubusercontent.com/LarsWrede/GFSM/main/01_Data%20%26%20Preprocessing/stocks-historical-data.csv', sep=';')[1:]
 new_header = ['Date']
-temp_list = list(stockdata.columns)
+temp_list = list(stockdata_df.columns)
 temp_list.remove('Unnamed: 0')
 
 for header in temp_list:
@@ -45,10 +51,10 @@ for header in temp_list:
     else:
         new_header.append(str(header) + ' Close')
 
-stockdata.columns = new_header
-stockdata['Date'] = pd.to_datetime(stockdata['Date'], dayfirst=True)
-stockdata.set_index('Date', inplace=True)
+stockdata_df.columns = new_header
+stockdata_df['Date'] = pd.to_datetime(stockdata_df['Date'], dayfirst=True)
+stockdata_df.set_index('Date', inplace=True)
 
-
+stockdata_df.to_csv('/Users/dennisblaufuss/Desktop/Uni/Repos/GFSM/01_Data & Preprocessing/stockdata_df.csv')
 
 print('checkpoint')
