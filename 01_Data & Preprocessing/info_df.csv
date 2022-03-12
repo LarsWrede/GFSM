@@ -1,0 +1,56 @@
+,Date,Symbol,Firmenname,Type,Announcement
+0,2010-06-21,SZG.DE,Salzgitter AG,Excluded,2010-04-06
+1,2015-09-21,LXS.DE,LANXESS Aktiengesellschaft,Excluded,2015-03-09
+2,2016-03-21,SDF.DE,K+S Aktiengesellschaft,Excluded,2016-03-03
+3,2018-03-19,PSM.DE,ProSiebenSat.1 Media SE,Excluded,2018-05-03
+4,2018-09-24,CBK.DE,Commerzbank AG,Excluded,2018-05-09
+5,2019-09-23,TKA.DE,thyssenkrupp AG,Excluded,2019-04-09
+6,2020-06-22,LHA.DE,Deutsche Lufthansa AG,Excluded,2020-04-06
+7,2020-08-24,WDI.HM,Wirecard AG,Excluded,2020-08-19
+8,2021-03-22,BEI.DE,Beiersdorf Aktiengesellschaft,Excluded,2021-03-03
+9,2021-10-29,DWNI.DE,Deutsche Wohnen SE,Excluded,2021-10-26
+10,2010-06-21,HEI.DE,HeidelbergCement AG,Included,2010-04-06
+11,2012-09-24,CON.DE,Continental Aktiengesellschaft,Included,2012-05-09
+12,2012-09-24,LXS.DE,LANXESS Aktiengesellschaft,Included,2012-05-09
+13,2015-09-21,VNA.DE,Vonovia SE,Included,2015-03-09
+14,2016-03-21,PSM.DE,ProSiebenSat.1 Media SE,Included,2016-03-03
+15,2018-03-19,1COV.DE,Covestro AG,Included,2018-05-03
+16,2018-09-24,WDI.HM,Wirecard AG,Included,2018-05-09
+17,2019-09-23,MTX.DE,MTU Aero Engines AG,Included,2019-04-09
+18,2020-06-22,DWNI.DE,Deutsche Wohnen SE,Included,2020-04-06
+19,2020-08-24,DHER.DE,Delivery Hero SE,Included,2020-08-19
+20,2021-03-22,ENR.DE,Siemens Energy AG,Included,2021-03-03
+21,2021-10-29,BEI.DE,Beiersdorf Aktiengesellschaft,Included,2021-10-26
+22,2021-09-20,AIR.DE,Airbus SE,Included,2021-03-09
+23,2021-09-20,BNR.DE,Brenntag SE,Included,2021-03-09
+24,2021-09-20,HFG.DE,HelloFresh SE,Included,2021-03-09
+25,2021-09-20,POAHY,Porsche,Included,2021-03-09
+26,2021-09-20,PUM.DE,PUMA SE,Included,2021-03-09
+27,2021-09-20,QIA.DE,Qiagen,Included,2021-03-09
+28,2021-09-20,SRT3.DE,Sartorius AG,Included,2021-03-09
+29,2021-09-20,SHL.DE,Siemens Healthineers AG,Included,2021-03-09
+30,2021-09-20,SY1.DE,Symrise AG,Included,2021-03-09
+31,2021-09-20,ZAL.DE,Zalando SE,Included,2021-03-09
+32,,^GDAXI,DAX,,
+33,,ADS.DE,adidas AG,,
+34,,ALV.DE,Allianz SE,,
+35,,BAS.DE,BASF SE,,
+36,,BAYN.DE,Bayer Aktiengesellschaft,,
+37,,BMW.DE,Bayerische Motoren Werke Aktiengesellschaft,,
+38,,DBK.DE,Deutsche Bank AG,,
+39,,DB1.DE,Deutsche Boerse AG,,
+40,,DPW.DE,Deutsche Post AG,,
+41,,DTE.DE,Deutsche Telekom AG,,
+42,,EON.BR,E.ON SE,,
+43,,FME.DE,Fresenius Medical Care AG & Co. KGaA,,
+44,,FRE.DE,Fresenius SE & Co. KGaA,,
+45,,HEN3.DE,Henkel AG & Co. KGaA ,,
+46,,IFX.DE,Infineon Technologies AG,,
+47,,LIN.DE,Linde plc,,
+48,,MBG.DE,Mercedes-Benz Group ,,
+49,,MRK.DE,MERCK Kommanditgesellschaft auf Aktien,,
+50,,MUV2.DE,Münchner Rückversicherungs-Gesellschaft,,
+51,,RWE.DE,RWE AG,,
+52,,SAP.DE,SAP,,
+53,,SIE.DE,Siemens Aktiengesellschaft,,
+54,,VOW3.DE,Volkswagen AG,,
