@@ -20,7 +20,6 @@ if user == 'Nicolas':
 if user == 'Phillip':  # lol
     local_git_link = '/Users/dennisblaufuss/Desktop/Uni/Repos/GFSM'
 
-
 exclusions = pd.read_csv('https://raw.githubusercontent.com/LarsWrede/GFSM/main/01_Data%20%26%20Preprocessing/DAX_excluded_2010-2021.csv', sep=';').rename(columns={'Ausgeschieden': 'Date'})
 exclusions['Type'] = 'Excluded'
 exclusions['Date'] = pd.to_datetime(exclusions['Date'])
@@ -42,9 +41,30 @@ announcements['Date'] = pd.to_datetime(announcements['Date'])
 info_df = info_df.join(announcements.set_index('Date')['Announcement'], on='Date')
 info_df['Announcement'] = pd.to_datetime(info_df['Announcement'])
 
-unique_stocks = list(dict.fromkeys(list(info_df.loc[~info_df['Type'].isnull()]['Symbol'])))
+stockdata_df = pd.read_csv('https://raw.githubusercontent.com/LarsWrede/GFSM/main/01_Data%20%26%20Preprocessing/stocks-historical-data.csv', sep=';')[1:]
+temp_list = list(stockdata_df.columns)
+temp_list.remove('Unnamed: 0')
+for header in temp_list:
+    if '1' in header:
+        temp_list.remove(header)
 
-#here map reuters -> yahoo
+info_df['Ticker'] = info_df['Symbol'].str[:3]
+
+for t in info_df['Ticker']:
+    if t == 'POA':
+        info_df['Ticker'].loc[info_df['Ticker'] == t] = 'PSHG_p.DE'
+    elif t == 'SRT':
+        info_df['Ticker'].loc[info_df['Ticker'] == t] = 'SATG.DE'
+    elif t == '^GD':
+        info_df['Ticker'].loc[info_df['Ticker'] == t] = 'XXX'
+    elif t == 'HEN':
+        info_df['Ticker'].loc[info_df['Ticker'] == t] = 'HNKG.DE'
+    elif t == 'MRK':
+        info_df['Ticker'].loc[info_df['Ticker'] == t] = 'MRCG.DE'
+    else:
+        for header in temp_list:
+            if t in header:
+                info_df['Ticker'].loc[info_df['Ticker'] == t] = header
 
 info_df.to_csv(local_git_link + '/01_Data & Preprocessing/info_df.csv')
 
@@ -54,7 +74,6 @@ info_df.to_csv(local_git_link + '/01_Data & Preprocessing/info_df.csv')
 * Dates are formatted in pandas datetime format and used as index.
 """
 
-stockdata_df = pd.read_csv('https://raw.githubusercontent.com/LarsWrede/GFSM/main/01_Data%20%26%20Preprocessing/stocks-historical-data.csv', sep=';')[1:]
 new_header = ['Date']
 temp_list = list(stockdata_df.columns)
 temp_list.remove('Unnamed: 0')
