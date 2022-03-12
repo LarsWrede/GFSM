@@ -1,4 +1,5 @@
 import pandas as pd
+import getpass
 
 """Creating Info DataFrame
 * Joining all Stocks that where at some point in time after 2010 in the DAX.
@@ -7,8 +8,8 @@ import pandas as pd
 * Symbol stands for the Yahoo Finance Ticker while Ticker is the Reuters one. This is due to the fact, that we first worked with yf but then switched to Reuters.
 """
 
-user = 'Dennis'
-if user == 'Dennis':
+user = getpass.getuser()
+if user == 'dennisblaufuss':
     local_git_link = '/Users/dennisblaufuss/Desktop/Uni/Repos/GFSM'
 if user == 'Lars':
     local_git_link = '/Users/dennisblaufuss/Desktop/Uni/Repos/GFSM'
