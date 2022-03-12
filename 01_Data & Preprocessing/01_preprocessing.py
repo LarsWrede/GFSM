@@ -7,6 +7,19 @@ import pandas as pd
 * Symbol stands for the Yahoo Finance Ticker while Ticker is the Reuters one. This is due to the fact, that we first worked with yf but then switched to Reuters.
 """
 
+user = 'Dennis'
+if user == 'Dennis':
+    local_git_link = '/Users/dennisblaufuss/Desktop/Uni/Repos/GFSM'
+if user == 'Lars':
+    local_git_link = '/Users/dennisblaufuss/Desktop/Uni/Repos/GFSM'
+if user == 'Sophie':
+    local_git_link = '/Users/dennisblaufuss/Desktop/Uni/Repos/GFSM'
+if user == 'Nicolas':
+    local_git_link = '/Users/dennisblaufuss/Desktop/Uni/Repos/GFSM'
+if user == 'Phillip':  # lol
+    local_git_link = '/Users/dennisblaufuss/Desktop/Uni/Repos/GFSM'
+
+
 exclusions = pd.read_csv('https://raw.githubusercontent.com/LarsWrede/GFSM/main/01_Data%20%26%20Preprocessing/DAX_excluded_2010-2021.csv', sep=';').rename(columns={'Ausgeschieden': 'Date'})
 exclusions['Type'] = 'Excluded'
 exclusions['Date'] = pd.to_datetime(exclusions['Date'])
@@ -32,7 +45,7 @@ unique_stocks = list(dict.fromkeys(list(info_df.loc[~info_df['Type'].isnull()]['
 
 #here map reuters -> yahoo
 
-info_df.to_csv('/Users/dennisblaufuss/Desktop/Uni/Repos/GFSM/01_Data & Preprocessing/info_df.csv')
+info_df.to_csv(local_git_link + '/01_Data & Preprocessing/info_df.csv')
 
 """Creating StockData DataFrame
 * All data is retrieved via Reuters.
@@ -55,6 +68,6 @@ stockdata_df.columns = new_header
 stockdata_df['Date'] = pd.to_datetime(stockdata_df['Date'], dayfirst=True)
 stockdata_df.set_index('Date', inplace=True)
 
-stockdata_df.to_csv('/Users/dennisblaufuss/Desktop/Uni/Repos/GFSM/01_Data & Preprocessing/stockdata_df.csv')
+stockdata_df.to_csv(local_git_link + '/01_Data & Preprocessing/stockdata_df.csv')
 
 print('checkpoint')

@@ -2,7 +2,8 @@ import pandas as pd
 import numpy as np
 
 
-info_df = 
+info_df = pd.read_csv('https://raw.githubusercontent.com/LarsWrede/GFSM/main/01_Data%20%26%20Preprocessing/info_df.csv')
+stockdata_df = pd.read_csv('https://raw.githubusercontent.com/LarsWrede/GFSM/main/01_Data%20%26%20Preprocessing/stockdata_df.csv')
 unique_stocks = list(dict.fromkeys(list(info_df.loc[~info_df['Type'].isnull()]['Symbol'])))
 
 corr_df_list = []
