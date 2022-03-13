@@ -132,6 +132,15 @@ stockdata_df_splined.drop(indexNames, inplace=True)
 ### delete nr_nan
 stockdata_df_splined.drop(['nr_nans'], axis=1, inplace=True)
 
+### Returns
+temp_list = list(stockdata_df_splined.columns)
+for header in temp_list:
+    if 'Close' in header:
+        temp_list.remove(header)
+
+for header in temp_list:
+    stockdata_df_splined[header[:-5] + 'Return'] = stockdata_df_splined[header].pct_change()
+
 ### save file to
 stockdata_df_splined.to_csv(local_git_link + '/01_Data_and_Preprocessing/stockdata_df.csv')
 
