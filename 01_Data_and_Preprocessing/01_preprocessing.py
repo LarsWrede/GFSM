@@ -138,6 +138,9 @@ stockdata_df_splined['nr_nans'] = nr_nans
 indexNames = stockdata_df_splined[stockdata_df_splined['nr_nans'] >= nr_columns_delete].index
 stockdata_df_splined.drop(indexNames, inplace=True)
 
+### delete nr_nan
+stockdata_df_splined.drop(['nr_nans'], axis=1, inplace=True)
+
 ### save file to
 stockdata_df_splined.to_csv(local_git_link + '/01_Data_and_Preprocessing/stockdata_df.csv')
 
