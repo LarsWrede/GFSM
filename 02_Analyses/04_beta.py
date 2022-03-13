@@ -33,7 +33,7 @@ DAX_ticker_new['Symbol'] = info_df[22:32].iloc[:,6].tolist()
 DAX_ticker_new['Date'] = pd.to_datetime(DAX_ticker_new['Date'], format='%Y-%m-%d')
 dax_new = {new: stockdata_df[new + ' Return'] for new in info_df[22:32].iloc[:,6].tolist()}
 
-''' Calculating the systmatic risk after the inclusion of the Stocks in the DAX.
+''' Calculating the systmatic risk after the inclusion AND exclusion of the Stocks in the DAX.
 To estimate the regression equations, OLS was used in conjunction with a correction procedure (Newey/West) 
 for serially correlated error terms. 
 This approach leads to test statistics that are robust against autocorrelated and 
