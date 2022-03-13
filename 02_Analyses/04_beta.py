@@ -1,5 +1,8 @@
 import pandas as pd
 import numpy as np
+import datetime
+import statistics
+import statsmodels.formula.api as smf
 
 # @ Dennis: Ich lösche die Zeilen 12-51 noch raus... als ich das heute früh umgeändert habe, gab es die daily returns im df noch nicht.
 # Ansonsten sollten die Werte unten, wie auf dem Foto sein.
