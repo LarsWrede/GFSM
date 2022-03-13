@@ -82,7 +82,7 @@ temp_list = list(stockdata_df.columns)
 temp_list.remove('Unnamed: 0')
 
 for header in temp_list:
-    if '1' in header:
+    if '.1' in header:
         new_header.append(header[:-2] + ' Volume')
     else:
         new_header.append(str(header) + ' Close')
@@ -138,5 +138,3 @@ stockdata_df_splined = stockdata_df_splined.reindex(sorted(stockdata_df_splined.
 
 ### save file to
 stockdata_df_splined.to_csv(local_git_link + '/01_Data_and_Preprocessing/stockdata_df.csv')
-
-print('checkpoint')
