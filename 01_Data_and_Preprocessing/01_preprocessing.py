@@ -76,6 +76,6 @@ stockdata_df.columns = new_header
 stockdata_df['Date'] = pd.to_datetime(stockdata_df['Date'], dayfirst=True)
 stockdata_df.set_index('Date', inplace=True)
 
-stockdata_df.to_csv(dir_utils.get_local_git_uri() + '/01_Data & Preprocessing/stockdata_df.csv')
+stockdata_df.to_csv(dir_utils.get_local_git_uri() + '/01_Data_and_Preprocessing/stockdata_df.csv')
 
 print('checkpoint')
