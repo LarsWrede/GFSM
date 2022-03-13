@@ -91,6 +91,54 @@ stockdata_df.columns = new_header
 stockdata_df['Date'] = pd.to_datetime(stockdata_df['Date'], dayfirst=True)
 stockdata_df.set_index('Date', inplace=True)
 
-stockdata_df.to_csv(local_git_link + '/01_Data_and_Preprocessing/stockdata_df.csv')
+#stockdata_df.to_csv(local_git_link + '/01_Data_and_Preprocessing/stockdata_df.csv')
+
+'''Interpolate Volume using 'spline' (and 'linear' for wirecard volume).
+
+Parameters
+:stockdata_df_splined:  df
+    Contains the interpolated data for all stocks as df. Note that all except volume
+    for wirecard is interpolated using spline method. As too many data point are missing
+    for wirecard volume, we use the linear method here.
+
+'''
+
+stockdata_df_splined = stockdata_df
+stockdata_df_splined = stockdata_df_splined.iloc[2: , :] #delete 2nd header and first empty row
+
+columns = stockdata_df_splined.columns.tolist()
+
+nr_columns = len(stockdata_df_splined.columns)
+nr_columns_delete = round(nr_columns*0.8)
+
+nr_nans = stockdata_df_splined.isnull().sum(axis=1).tolist()
+
+### change str to float
+stockdata_df_splined = stockdata_df_splined.replace(',','.',regex=True)
+
+for col in columns:
+    stockdata_df_splined[col] = stockdata_df_splined[col].astype(float)
+
+#print(stockdata_df_splined.dtypes) #test if all are floats
+
+### interpolate
+for col in columns:
+    stockdata_df_splined[col].interpolate(method ='spline', order = 2, inplace=True, limit_direction='both', limit_area='inside')
+
+#stockdata_df_splined['SATG.DE Volume']#.head(50) #no NaNs should now be visible
+#stockdata_df['SATG.DE Volume']#.head(50)
+
+### interpolate wirecard volume linearly because spline does not work beacuse too many values are missing
+stockdata_df_splined['WDIG.H Volume'].interpolate(method ='linear', inplace=True, limit_direction='both', limit_area='inside')
+
+### add row with NaN count
+stockdata_df_splined['nr_nans'] = nr_nans
+
+### delete all rows with missing data for >= 80% of stocks
+indexNames = stockdata_df_splined[stockdata_df_splined['nr_nans'] >= nr_columns_delete].index
+stockdata_df_splined.drop(indexNames, inplace=True)
+
+### save file to
+stockdata_df_splined.to_csv(local_git_link + '/01_Data_and_Preprocessing/stockdata_df.csv')
 
 print('checkpoint')
