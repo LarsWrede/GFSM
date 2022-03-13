@@ -44,7 +44,7 @@ announcements['Date'] = pd.to_datetime(announcements['Date'])
 info_df = info_df.join(announcements.set_index('Date')['Announcement'], on='Date')
 info_df['Announcement'] = pd.to_datetime(info_df['Announcement'])
 
-stockdata_df = pd.read_csv('https://raw.githubusercontent.com/LarsWrede/GFSM/main/01_Data_and_Preprocessing/stocks-historical-data.csv', sep=';')
+stockdata_df = pd.read_csv('https://raw.githubusercontent.com/LarsWrede/GFSM/main/01_Data_and_Preprocessing/stocks-historical-data.csv', sep=';')[1:]
 temp_list = list(stockdata_df.columns)
 temp_list.remove('Unnamed: 0')
 for header in temp_list:
@@ -91,8 +91,6 @@ stockdata_df.columns = new_header
 stockdata_df['Date'] = pd.to_datetime(stockdata_df['Date'], dayfirst=True)
 stockdata_df.set_index('Date', inplace=True)
 
-#stockdata_df.to_csv(local_git_link + '/01_Data_and_Preprocessing/stockdata_df.csv')
-
 '''Interpolate Volume using 'spline' (and 'linear' for wirecard volume).
 
 Parameters
@@ -104,8 +102,7 @@ Parameters
 '''
 
 stockdata_df_splined = stockdata_df
-stockdata_df_splined = stockdata_df_splined.iloc[2: , :] #delete 2nd header and first empty row
-
+stockdata_df_splined = stockdata_df_splined.iloc[1:]
 columns = stockdata_df_splined.columns.tolist()
 
 nr_columns = len(stockdata_df_splined.columns)
