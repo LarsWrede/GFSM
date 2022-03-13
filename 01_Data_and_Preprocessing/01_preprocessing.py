@@ -119,13 +119,10 @@ stockdata_df_splined.drop(indexNames, inplace=True)
 ### delete nr_nan
 stockdata_df_splined.drop(['nr_nans'], axis=1, inplace=True)
 
-### change str to float
+### change str to float & interpolate
 stockdata_df_splined = stockdata_df_splined.replace(',', '.', regex=True)
 for col in columns:
     stockdata_df_splined[col] = stockdata_df_splined[col].astype(float)
-
-### interpolate
-for col in columns:
     if not col == 'WDIG.H Volume':
         stockdata_df_splined[col].interpolate(method='spline', order=2, inplace=True, limit_direction='both', limit_area='inside')
 
@@ -133,13 +130,9 @@ for col in columns:
 stockdata_df_splined['WDIG.H Volume'].interpolate(method='linear', inplace=True, limit_direction='both', limit_area='inside')
 
 ### Returns
-temp_list = list(stockdata_df_splined.columns)
-for header in temp_list:
-    if 'Volume' in header:
-        temp_list.remove(header)
-
-for header in temp_list:
-    stockdata_df_splined[header[:-5] + 'Return'] = stockdata_df_splined[header].pct_change()
+for header in list(stockdata_df_splined.columns):
+    if 'Close' in header:
+        stockdata_df_splined[header[:-5] + 'Return'] = stockdata_df_splined[header].pct_change()
 
 stockdata_df_splined = stockdata_df_splined.reindex(sorted(stockdata_df_splined.columns), axis=1)
 
