@@ -111,19 +111,13 @@ nr_columns_delete = round(nr_columns*0.8)
 nr_nans = stockdata_df_splined.isnull().sum(axis=1).tolist()
 
 ### change str to float
-stockdata_df_splined = stockdata_df_splined.replace(',','.',regex=True)
-
+stockdata_df_splined = stockdata_df_splined.replace(',', '.', regex=True)
 for col in columns:
     stockdata_df_splined[col] = stockdata_df_splined[col].astype(float)
-
-#print(stockdata_df_splined.dtypes) #test if all are floats
 
 ### interpolate
 for col in columns:
     stockdata_df_splined[col].interpolate(method ='spline', order = 2, inplace=True, limit_direction='both', limit_area='inside')
-
-#stockdata_df_splined['SATG.DE Volume']#.head(50) #no NaNs should now be visible
-#stockdata_df['SATG.DE Volume']#.head(50)
 
 ### interpolate wirecard volume linearly because spline does not work beacuse too many values are missing
 stockdata_df_splined['WDIG.H Volume'].interpolate(method ='linear', inplace=True, limit_direction='both', limit_area='inside')
@@ -141,4 +135,5 @@ stockdata_df_splined.drop(['nr_nans'], axis=1, inplace=True)
 ### save file to
 stockdata_df_splined.to_csv(local_git_link + '/01_Data_and_Preprocessing/stockdata_df.csv')
 
+print('checkpoint')
 print('checkpoint')
