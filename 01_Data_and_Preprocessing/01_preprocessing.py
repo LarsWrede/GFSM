@@ -108,21 +108,8 @@ columns = stockdata_df_splined.columns.tolist()
 nr_columns = len(stockdata_df_splined.columns)
 nr_columns_delete = round(nr_columns*0.8)
 
-nr_nans = stockdata_df_splined.isnull().sum(axis=1).tolist()
-
-### change str to float
-stockdata_df_splined = stockdata_df_splined.replace(',', '.', regex=True)
-for col in columns:
-    stockdata_df_splined[col] = stockdata_df_splined[col].astype(float)
-
-### interpolate
-for col in columns:
-    stockdata_df_splined[col].interpolate(method ='spline', order = 2, inplace=True, limit_direction='both', limit_area='inside')
-
-### interpolate wirecard volume linearly because spline does not work beacuse too many values are missing
-stockdata_df_splined['WDIG.H Volume'].interpolate(method ='linear', inplace=True, limit_direction='both', limit_area='inside')
-
 ### add row with NaN count
+nr_nans = stockdata_df_splined.isnull().sum(axis=1).tolist()
 stockdata_df_splined['nr_nans'] = nr_nans
 
 ### delete all rows with missing data for >= 80% of stocks
@@ -131,6 +118,19 @@ stockdata_df_splined.drop(indexNames, inplace=True)
 
 ### delete nr_nan
 stockdata_df_splined.drop(['nr_nans'], axis=1, inplace=True)
+
+### change str to float
+stockdata_df_splined = stockdata_df_splined.replace(',', '.', regex=True)
+for col in columns:
+    stockdata_df_splined[col] = stockdata_df_splined[col].astype(float)
+
+### interpolate
+for col in columns:
+    if not col == 'WDIG.H Volume':
+        stockdata_df_splined[col].interpolate(method='spline', order=2, inplace=True, limit_direction='both', limit_area='inside')
+
+### interpolate wirecard volume linearly because spline does not work beacuse too many values are missing
+stockdata_df_splined['WDIG.H Volume'].interpolate(method='linear', inplace=True, limit_direction='both', limit_area='inside')
 
 ### Returns
 temp_list = list(stockdata_df_splined.columns)
