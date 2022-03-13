@@ -15,3 +15,18 @@ def get_local_git_uri():
     if user == 'Phillip':  # lol
         local_git_link = '/Users/dennisblaufuss/Desktop/Uni/Repos/GFSM'
     return local_git_link
+
+def get_directory_delimiter():
+    user = getpass.getuser()
+    if user == 'dennisblaufuss':
+        return '/'
+    if user == 'Lars':
+        return '/'
+    if user == 'sophiemerl':
+        return '/'
+    if user == 'nicol':
+       return '\\'
+    if user == 'nicolaskepper':
+        return '/'
+    if user == 'Phillip':  # lol
+        return '/'
