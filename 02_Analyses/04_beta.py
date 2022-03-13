@@ -12,47 +12,24 @@ stockdata_df = pd.read_csv('https://raw.githubusercontent.com/LarsWrede/GFSM/mai
 stockdata_df['Date'] = pd.to_datetime(stockdata_df['Date'])
 stockdata_df.set_index('Date', inplace=True)
 unique_stocks = list(dict.fromkeys(list(info_df.loc[~info_df['Type'].isnull()]['Ticker'])))
+benchmark = pd.read_csv('https://raw.githubusercontent.com/LarsWrede/GFSM/Archive/DAX_Kurs.csv', sep = ';')
 
-# List with all stocks that got excluded from the DAX (2010-2021).
 DAX_excluded = info_df[0:10].iloc[:,[1,2,3]]
-DAX_excluded['Symbol'] = ['SZGG.DE Close', 'LXSG.DE Close', 'SDFGn.DE Close', 'PSMGn.DE Close', 'CBKG.DE Close',  'TKAG.DE Close', 'LHAG.DE Close', 'WDIG.H Close', 'BEIG.DE Close', 'DWNG.DE Close']
+DAX_excluded['Symbol'] = info_df[0:10].iloc[:,6].tolist()
 DAX_excluded['Date'] = pd.to_datetime(DAX_excluded['Date'], format='%Y-%m-%d')
-
-#List with all stocks that got included in the DAX (2010-2021).
 DAX_included = info_df[10:32].iloc[:,[1,2,3]]
-DAX_included['Symbol'] = ['HEIG.DE Close', 'CONG.DE Close', 'LXSG.DE Close', 'VNAn.DE Close', 'PSMGn.DE Close', '1COV.DE Close', 'WDIG.H Close',
-                          'MTXGn.DE Close', 'DWNG.DE Close', 'DHER.DE Close','ENR1n.DE Close', 'BEIG.DE Close', 'AIRG.DE Close', 'BNRGn.DE Close',
-                          'HFGG.DE Close', 'PSHG_p.DE Close', 'PUMG.DE Close', 'QIA.DE Close', 'SATG.DE Close', 'SHLG.DE Close', 'SY1G.DE Close', 
-                          'ZALG.DE Close']
+DAX_included['Symbol'] = info_df[10:32].iloc[:,6].tolist()
 DAX_included['Date'] = pd.to_datetime(DAX_included['Date'], format='%Y-%m-%d')
 
-# Extending the stockdata_df with the Benchmark.
 benchmark['Date'] = pd.to_datetime(benchmark['Umtauschdatum'], format='%d.%m.%y')
 stockdata_df['Date'] = pd.to_datetime(stockdata_df['Date'], format='%Y-%m-%d')
 stockdata_df = pd.merge(stockdata_df, benchmark, on ='Date')
 stockdata_df['Date'] = pd.to_datetime(stockdata_df['Date'], format='%Y-%m-%d')
 stockdata_df = stockdata_df.set_index('Date')
 
-excluders = ['SZGG.DE Close', 'LXSG.DE Close', 'SDFGn.DE Close', 'PSMGn.DE Close', 'CBKG.DE Close',  'TKAG.DE Close', 'LHAG.DE Close', 'WDIG.H Close', 'BEIG.DE Close', 'DWNG.DE Close', 'Schlusskurs']
-excluders = {new: stockdata_df[new] for new in excluders}
-
-includers = ['HEIG.DE Close', 'CONG.DE Close', 'LXSG.DE Close', 'VNAn.DE Close', 'PSMGn.DE Close', '1COV.DE Close', 'WDIG.H Close',
-                          'MTXGn.DE Close', 'DWNG.DE Close', 'DHER.DE Close','ENR1n.DE Close', 'BEIG.DE Close', 'AIRG.DE Close', 'BNRGn.DE Close',
-                          'HFGG.DE Close', 'PSHG_p.DE Close', 'PUMG.DE Close', 'QIA.DE Close', 'SATG.DE Close', 'SHLG.DE Close', 'SY1G.DE Close', 
-                          'ZALG.DE Close', 'Schlusskurs']
-includers = {new: stockdata_df[new] for new in includers}
-
-# Calculating daily returns
-returns_daily_included = {}
-for s in includers:
-    includers[s] = includers[s].dropna().str.replace(',', '.').astype(float)
-    returns_daily_included[s] = includers[s].pct_change()
-    
-returns_daily_excluded = {}
-for s in excluders:
-    #excluders[s] = excluders[s].dropna().str.replace(',', '.').astype(float)
-    returns_daily_excluded[s] = excluders[s].pct_change()
-benchmark = pd.DataFrame(returns_daily_excluded['Schlusskurs'])
+returns_daily_excluded = {new: stockdata_df[new + ' Return'] for new in DAX_excluded['Symbol'].tolist()}
+returns_daily_included = {new: stockdata_df[new + ' Return'] for new in DAX_included['Symbol'].tolist()}
+benchmark = pd.DataFrame(stockdata_df['Schlusskurs'].pct_change())
 
 ''' Calculating the systmatic risk after the inclusion of the Stocks in the DAX.
 To estimate the regression equations, OLS was used in conjunction with a correction procedure (Newey/West) 
@@ -90,7 +67,7 @@ while i in range(0,10):
     data = pd.DataFrame(returns_daily_included[DAX_included.iloc[i][1]][str(DAX_included.iloc[i][0] - datetime.timedelta(days=365)):str(DAX_included.iloc[i][0] + datetime.timedelta(days=365))])
     data['Benchmark'] = benchmark['Schlusskurs'][str(DAX_included.iloc[i][0] - datetime.timedelta(days=365)):str(DAX_included.iloc[i][0] + datetime.timedelta(days=365))]
     data['Dummy'] = benchmark['Dummy'][str(DAX_included.iloc[i][0] - datetime.timedelta(days=365)):str(DAX_included.iloc[i][0] + datetime.timedelta(days=365))]
-    data = data.rename(columns = {DAX_included.iloc[i][1]: 'y', 'Dummy': 'D', 'Benchmark': 'x'})
+    data = data.rename(columns = {f"{DAX_included.iloc[i][1]} Return": 'y', 'Dummy': 'D', 'Benchmark': 'x'})
     reg = smf.ols('y ~ x + D*x', data).fit(cov_type='HAC',cov_kwds={'maxlags':1})
     sys_risk.append(
         {
@@ -115,7 +92,7 @@ while i in range(10,len(returns_daily_included)-1):
     data = pd.DataFrame(returns_daily_included[DAX_included.iloc[i][1]][str(DAX_included.iloc[i][0] - datetime.timedelta(days=365)):'2022-03-01'])
     data['Benchmark'] = benchmark['Schlusskurs'][str(DAX_included.iloc[i][0] - datetime.timedelta(days=365)):'2022-03-01']
     data['Dummy'] = benchmark['Dummy'][str(DAX_included.iloc[i][0] - datetime.timedelta(days=365)):'2022-03-01']
-    data = data.rename(columns = {DAX_included.iloc[i][1]: 'y', 'Dummy': 'D', 'Benchmark': 'x'})
+    data = data.rename(columns = {f"{DAX_included.iloc[i][1]} Return": 'y', 'Dummy': 'D', 'Benchmark': 'x'})
     reg = smf.ols('y ~ x + D*x', data).fit(cov_type='HAC',cov_kwds={'maxlags':1})
     sys_risk.append(
         {
@@ -136,9 +113,7 @@ sys_risk.append(
             r"$R^{2}$": sys_risk[r"$R^{2}$"].mean()
         }, ignore_index=True
     )
-    
-    
-    
+
 ''' Calculating the systmatic risk after the exclusion of the Stocks in the DAX.
 To estimate the regression equations, OLS was used in conjunction with a correction procedure (Newey/West) 
 for serially correlated error terms. 
@@ -176,7 +151,7 @@ while i in range(0,7):
     data = pd.DataFrame(returns_daily_excluded[DAX_excluded.iloc[i][1]][str(DAX_excluded.iloc[i][0] - datetime.timedelta(days=365)):str(DAX_excluded.iloc[i][0] + datetime.timedelta(days=365))])
     data['Benchmark'] = benchmark['Schlusskurs'][str(DAX_excluded.iloc[i][0] - datetime.timedelta(days=365)):str(DAX_excluded.iloc[i][0] + datetime.timedelta(days=365))]
     data['Dummy'] = benchmark['Dummy'][str(DAX_excluded.iloc[i][0] - datetime.timedelta(days=365)):str(DAX_excluded.iloc[i][0] + datetime.timedelta(days=365))]   
-    data = data.rename(columns = {DAX_excluded.iloc[i][1]: 'y', 'Dummy': 'D', 'Benchmark': 'x'})
+    data = data.rename(columns = {f"{DAX_excluded.iloc[i][1]} Return": 'y', 'Dummy': 'D', 'Benchmark': 'x'})
     reg = smf.ols('y ~ x + D*x', data).fit(cov_type='HAC',cov_kwds={'maxlags':1})
     sys_risk.append(
         {
@@ -201,7 +176,7 @@ while i in range(7,len(returns_daily_excluded)-1):
     data = pd.DataFrame(returns_daily_excluded[DAX_excluded.iloc[i][1]][str(DAX_excluded.iloc[i][0] - datetime.timedelta(days=365)):'2022-03-01'])
     data['Benchmark'] = benchmark['Schlusskurs'][str(DAX_excluded.iloc[i][0] - datetime.timedelta(days=365)):'2022-03-01']
     data['Dummy'] = benchmark['Dummy'][str(DAX_excluded.iloc[i][0] - datetime.timedelta(days=365)):'2022-03-01']
-    data = data.rename(columns = {DAX_excluded.iloc[i][1]: 'y', 'Dummy': 'D', 'Benchmark': 'x'})
+    data = data.rename(columns = {f"{DAX_excluded.iloc[i][1]} Return": 'y', 'Dummy': 'D', 'Benchmark': 'x'})
     reg = smf.ols('y ~ x + D*x', data).fit(cov_type='HAC',cov_kwds={'maxlags':1})
     sys_risk.append(
         {
@@ -222,20 +197,8 @@ sys_risk.append(
             r"$R^{2}$": sys_risk[r"$R^{2}$"].mean()            
         }, ignore_index=True
     )
-    
-    
-''' Creating a list and dictionary with all 10 newly added DAX stocks.
-Parameters
-----------
-:newcomers:  list
-    Contains the names of the stocks.
-:dax_new: dict
-    Contains the daily returns of the 10 new stocks.
--------
-'''
-newcomers = ['AIRG.DE Close', 'SHLG.DE Close', 'ZALG.DE Close', 'SY1G. Volume', 'SATG.DE Close',  'PSHG_p.DE Close', 'HFGG.DE Close', 'BNRGn.DE Close', 'QIA.DE Close', 'PUMG.DE Close']
-dax_new = {new: returns_daily_included[new] for new in newcomers}
 
+dax_new = {new: stockdata_df[new + ' Return'] for new in info_df[22:32].iloc[:,6].tolist()}
 ''' Creating the dummy variable - 0 before the inclusion day (2021-09-20) and 1 thereafter.
 Parameters
 ----------
@@ -249,7 +212,6 @@ for date in benchmark.index:
         d.append(0)
     else: d.append(1)
 benchmark['Dummy'] = d
-
 
 ''' Calculating the systmatic risk.
 To estimate the regression equations, OLS was used in conjunction with a correction procedure (Newey/West) 
@@ -280,7 +242,7 @@ for key in dax_new:
     data['Benchmark'] = benchmark['Schlusskurs']['2020-09-20':'2022-03-01']
     data['Dummy'] = benchmark['Dummy']['2020-09-20':'2022-03-01']
     #stocks_as_df['Volume'][key]['2020-09-20':'2021-09-20']    
-    data = data.rename(columns = {key: 'y', 'Dummy': 'D', 'Benchmark': 'x'})
+    data = data.rename(columns = {f"{key} Return": 'y', 'Dummy': 'D', 'Benchmark': 'x'})
     reg = smf.ols('y ~ x + D*x', data).fit(cov_type='HAC',cov_kwds={'maxlags':1})
     sys_risk.append(
         {
@@ -300,7 +262,7 @@ sys_risk.append(
             r"$R^{2}$": sys_risk[r"$R^{2}$"].mean()
         }, ignore_index=True
     )
-    
+
 '''Distribution of the shares with a higher unit share in the DAX and all those with a weighting of < 1 %. 
 Parameters
 ----------
