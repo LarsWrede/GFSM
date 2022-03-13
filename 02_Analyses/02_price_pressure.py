@@ -1,10 +1,10 @@
 import sys
 
 import pandas as pd
-import numpy as np
 from datetime import timedelta
 from datetime import datetime
 from lib import dir_utils
+import scipy.stats
 
 git_uri = dir_utils.get_local_git_uri()
 delim = dir_utils.get_directory_delimiter()
@@ -25,6 +25,7 @@ def prep_dfs():
     close = pd.DataFrame(data={col.split(" ")[0]: stocks[col] for col in stocks.columns if 'Close' in col})
 
     return vol, close, info
+
 
 def calc_mvr_multiple_days(year_start, year_end, inclusions, day_range, stocks, market_symbol):
     """
@@ -128,11 +129,39 @@ def calc_vr(announcement_date, day, stocks, stock_symbol, market_symbol):
     return (v_it / v_mt) * (v_m / v_i)
 
 
+def calc_volume_table(inclusions, stocks, market_symbol, year_ranges):
+    df = pd.DataFrame(
+        columns=['N', 'MVR Day 1', 'STD Day 1', 't Day 1', '% > 1 Day 1', 'MVR Day 1-5', 'STD Day 1-5', 't Day 1-5',
+                 '% > 1 Day 1-5'])
+
+    for (y1, y2) in year_ranges:
+        s, m, stdev, n = calc_mvr(y1, y2, inclusions, 1, stocks, market_symbol)
+        if n <= 1:
+            continue
+        t = scipy.stats.ttest_1samp(s, 1).statistic
+        p = s.gt(1).sum() / s.size * 100
+        d = {'N': n, 'MVR Day 1': m, 'STD Day 1': stdev, 't Day 1': t, '% > 1 Day 1': p}
+        s, m, stdev, _ = calc_mvr_multiple_days(y1, y2, inclusions, range(1, 6), stocks, market_symbol)
+        d['MVR Day 1-5'] = m
+        d['STD Day 1-5'] = stdev
+        d['t Day 1-5'] = scipy.stats.ttest_1samp(s, 1).statistic
+        d['% > 1 Day 1-5'] = s.gt(1).sum() / s.size * 100
+
+        df = df.append(pd.DataFrame(data=d, index=[str(y1) if y1 == y2 else str(y1) + '-' + str(y2)]))
+    return df
+
+
+
+
+
+
+
 volumes, prices, info = prep_dfs()
 inclusions = info[info['Type'] == 'Included']
 
-#print(calc_vr(inclusions['Announcement'].iloc[0], 1, volumes, 'HEIG.DE', '.GDAXI'))
-#print(inclusions['Announcement'].iloc[0])
+"""
+print(calc_vr(inclusions['Announcement'].iloc[0], 1, volumes, 'HEIG.DE', '.GDAXI'))
+print(inclusions['Announcement'].iloc[0])
 
 print(calc_mvr(2010, 2012, inclusions, 1, volumes, '.GDAXI'))
 print(calc_mvr(2010, 2012, inclusions, 2, volumes, '.GDAXI'))
@@ -140,5 +169,26 @@ print(calc_mvr(2010, 2012, inclusions, 3, volumes, '.GDAXI'))
 print(calc_mvr(2010, 2012, inclusions, 4, volumes, '.GDAXI'))
 print(calc_mvr(2010, 2012, inclusions, 5, volumes, '.GDAXI'))
 
-print(calc_mvr_multiple_days(2010, 2022, inclusions, range(1, 5), volumes, '.GDAXI'))
+print(calc_mvr(2010, 2022, inclusions, 1, volumes, '.GDAXI'))
+s, m, stdev, n = calc_mvr(2010, 2022, inclusions, 1, volumes, '.GDAXI')
+t = scipy.stats.ttest_1samp(s, 1)
+p = s.gt(1).sum() / s.size
+print(t, p)
 
+print(calc_mvr_multiple_days(2010, 2022, inclusions, range(1, 6), volumes, '.GDAXI'))
+s, m, stdev, _ = calc_mvr_multiple_days(2010, 2022, inclusions, range(1, 6), volumes, '.GDAXI')
+t = scipy.stats.ttest_1samp(s, 1).statistic
+p = s.gt(1).sum() / s.size
+print(t, p)
+"""
+
+
+year_ranges = [(2010, 2021), (2010, 2015), (2016, 2021)]
+year_ranges += [(x, x) for x in range(2010, 2022)]
+
+#volume_df = calc_volume_table(inclusions, volumes, '.GDAXI', year_ranges)
+
+#with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
+#    print(volume_df)
+
+print(prices)
