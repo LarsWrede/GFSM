@@ -4,9 +4,6 @@ import datetime
 import statistics
 import statsmodels.formula.api as smf
 
-# @ Dennis: Ich lösche die Zeilen 12-51 noch raus... als ich das heute früh umgeändert habe, gab es die daily returns im df noch nicht.
-# Ansonsten sollten die Werte unten, wie auf dem Foto sein.
-
 info_df = pd.read_csv('https://raw.githubusercontent.com/LarsWrede/GFSM/main/01_Data_and_Preprocessing/info_df.csv')
 stockdata_df = pd.read_csv('https://raw.githubusercontent.com/LarsWrede/GFSM/main/01_Data_and_Preprocessing/stockdata_df.csv')
 stockdata_df['Date'] = pd.to_datetime(stockdata_df['Date'])
@@ -31,189 +28,12 @@ returns_daily_excluded = {new: stockdata_df[new + ' Return'] for new in DAX_excl
 returns_daily_included = {new: stockdata_df[new + ' Return'] for new in DAX_included['Symbol'].tolist()}
 benchmark = pd.DataFrame(stockdata_df['Schlusskurs'].pct_change())
 
-''' Calculating the systmatic risk after the inclusion of the Stocks in the DAX.
-To estimate the regression equations, OLS was used in conjunction with a correction procedure (Newey/West) 
-for serially correlated error terms. 
-This approach leads to test statistics that are robust against autocorrelated and 
-heteroskedastic disturbance terms.
-
-Time Horizon
-----------
-Start: 2009-06-21
-End: 2022-03-01
-----------
-
-Parameters
-----------
-:sys_risk:  df
-    Stock: Name of the specific stock.
-    Rank: Sorted after index weight (ascending).
-    Delta: Measures the change in the systematic risk of the share triggered by the inclusion.
-    p-Value: The two-tailed p-values for the t-stats of the params.
-    R^2: R-squared of the model.
--------
-'''
-i = 0
-j = 1
-sys_risk = []
-while i in range(0,10):
-    d = []
-    for date in benchmark.index:
-        if str(date) < str(DAX_included.iloc[i][0]):
-            d.append(0)
-        else: d.append(1)
-    benchmark['Dummy'] = d
-
-    data = pd.DataFrame(returns_daily_included[DAX_included.iloc[i][1]][str(DAX_included.iloc[i][0] - datetime.timedelta(days=365)):str(DAX_included.iloc[i][0] + datetime.timedelta(days=365))])
-    data['Benchmark'] = benchmark['Schlusskurs'][str(DAX_included.iloc[i][0] - datetime.timedelta(days=365)):str(DAX_included.iloc[i][0] + datetime.timedelta(days=365))]
-    data['Dummy'] = benchmark['Dummy'][str(DAX_included.iloc[i][0] - datetime.timedelta(days=365)):str(DAX_included.iloc[i][0] + datetime.timedelta(days=365))]
-    data = data.rename(columns = {f"{DAX_included.iloc[i][1]} Return": 'y', 'Dummy': 'D', 'Benchmark': 'x'})
-    reg = smf.ols('y ~ x + D*x', data).fit(cov_type='HAC',cov_kwds={'maxlags':1})
-    sys_risk.append(
-        {
-            'Stock': DAX_included.iloc[i][2],
-            'Rank': j, 
-            r"$\Delta$": reg.params[3], 
-            'p_Value': reg.pvalues[3], 
-            r"$R^{2}$": reg.rsquared
-        }
-    )
-    j += 1
-    i += 1
-  
-while i in range(10,len(returns_daily_included)-1):
-    d = []
-    for date in benchmark.index:
-        if str(date) < str(DAX_included.iloc[i][0]):
-            d.append(0)
-        else: d.append(1)
-    benchmark['Dummy'] = d
-
-    data = pd.DataFrame(returns_daily_included[DAX_included.iloc[i][1]][str(DAX_included.iloc[i][0] - datetime.timedelta(days=365)):'2022-03-01'])
-    data['Benchmark'] = benchmark['Schlusskurs'][str(DAX_included.iloc[i][0] - datetime.timedelta(days=365)):'2022-03-01']
-    data['Dummy'] = benchmark['Dummy'][str(DAX_included.iloc[i][0] - datetime.timedelta(days=365)):'2022-03-01']
-    data = data.rename(columns = {f"{DAX_included.iloc[i][1]} Return": 'y', 'Dummy': 'D', 'Benchmark': 'x'})
-    reg = smf.ols('y ~ x + D*x', data).fit(cov_type='HAC',cov_kwds={'maxlags':1})
-    sys_risk.append(
-        {
-            'Stock': DAX_included.iloc[i][2],
-            'Rank': j, 
-            r"$\Delta$": reg.params[3], 
-            'p_Value': reg.pvalues[3], 
-            r"$R^{2}$": reg.rsquared
-        }
-    )
-    j += 1
-    i += 1
-sys_risk = pd.DataFrame(sys_risk)
-sys_risk.append(
-        {
-            'Stock': r"$\varnothing$",
-            r"$\Delta$": sys_risk[r"$\Delta$"].mean(),
-            r"$R^{2}$": sys_risk[r"$R^{2}$"].mean()
-        }, ignore_index=True
-    )
-
-''' Calculating the systmatic risk after the exclusion of the Stocks in the DAX.
-To estimate the regression equations, OLS was used in conjunction with a correction procedure (Newey/West) 
-for serially correlated error terms. 
-This approach leads to test statistics that are robust against autocorrelated and 
-heteroskedastic disturbance terms.
-
-Time Horizon
-----------
-Start: 2009-06-21
-End: 2022-03-01
-----------
-
-Parameters
-----------
-:sys_risk:  df
-    Stock: Name of the specific stock.
-    Rank: Sorted after index weight (ascending).
-    Delta: Measures the change in the systematic risk of the share triggered by the inclusion.
-    p-Value: The two-tailed p-values for the t-stats of the params.
-    R^2: R-squared of the model.
--------
-'''
-
-i = 0
-j = 1
-sys_risk = []
-while i in range(0,7):
-    d = []
-    for date in benchmark.index:
-        if str(date) < str(DAX_excluded.iloc[i][0]):
-            d.append(0)
-        else: d.append(1)
-    benchmark['Dummy'] = d
-
-    data = pd.DataFrame(returns_daily_excluded[DAX_excluded.iloc[i][1]][str(DAX_excluded.iloc[i][0] - datetime.timedelta(days=365)):str(DAX_excluded.iloc[i][0] + datetime.timedelta(days=365))])
-    data['Benchmark'] = benchmark['Schlusskurs'][str(DAX_excluded.iloc[i][0] - datetime.timedelta(days=365)):str(DAX_excluded.iloc[i][0] + datetime.timedelta(days=365))]
-    data['Dummy'] = benchmark['Dummy'][str(DAX_excluded.iloc[i][0] - datetime.timedelta(days=365)):str(DAX_excluded.iloc[i][0] + datetime.timedelta(days=365))]   
-    data = data.rename(columns = {f"{DAX_excluded.iloc[i][1]} Return": 'y', 'Dummy': 'D', 'Benchmark': 'x'})
-    reg = smf.ols('y ~ x + D*x', data).fit(cov_type='HAC',cov_kwds={'maxlags':1})
-    sys_risk.append(
-        {
-            'Stock': DAX_excluded.iloc[i][2],
-            'Rank': j, 
-            r"$\Delta$": reg.params[3], 
-            'p_Value': reg.pvalues[3], 
-            r"$R^{2}$": reg.rsquared
-        }
-    )
-    j += 1
-    i += 1
-    
-while i in range(7,len(returns_daily_excluded)-1):
-    d = []
-    for date in benchmark.index:
-        if str(date) < str(DAX_excluded.iloc[i][0]):
-            d.append(0)
-        else: d.append(1)
-    benchmark['Dummy'] = d
-
-    data = pd.DataFrame(returns_daily_excluded[DAX_excluded.iloc[i][1]][str(DAX_excluded.iloc[i][0] - datetime.timedelta(days=365)):'2022-03-01'])
-    data['Benchmark'] = benchmark['Schlusskurs'][str(DAX_excluded.iloc[i][0] - datetime.timedelta(days=365)):'2022-03-01']
-    data['Dummy'] = benchmark['Dummy'][str(DAX_excluded.iloc[i][0] - datetime.timedelta(days=365)):'2022-03-01']
-    data = data.rename(columns = {f"{DAX_excluded.iloc[i][1]} Return": 'y', 'Dummy': 'D', 'Benchmark': 'x'})
-    reg = smf.ols('y ~ x + D*x', data).fit(cov_type='HAC',cov_kwds={'maxlags':1})
-    sys_risk.append(
-        {
-            'Stock': DAX_excluded.iloc[i][2],
-            'Rank': j, 
-            r"$\Delta$": reg.params[3], 
-            'p_Value': reg.pvalues[3], 
-            r"$R^{2}$": reg.rsquared
-        }
-    )
-    j += 1
-    i += 1
-sys_risk = pd.DataFrame(sys_risk)
-sys_risk.append(
-        {
-            'Stock': r"$\varnothing$",
-            r"$\Delta$": sys_risk[r"$\Delta$"].mean(),
-            r"$R^{2}$": sys_risk[r"$R^{2}$"].mean()            
-        }, ignore_index=True
-    )
-
+DAX_ticker_new = info_df[22:32].iloc[:,[1,2,3]]
+DAX_ticker_new['Symbol'] = info_df[22:32].iloc[:,6].tolist()
+DAX_ticker_new['Date'] = pd.to_datetime(DAX_ticker_new['Date'], format='%Y-%m-%d')
 dax_new = {new: stockdata_df[new + ' Return'] for new in info_df[22:32].iloc[:,6].tolist()}
-''' Creating the dummy variable - 0 before the inclusion day (2021-09-20) and 1 thereafter.
-Parameters
-----------
-:benchmark:  df
-    Contains daily returns as well as the dummy variable.
--------
-'''
-d = []
-for date in benchmark.index:
-    if str(date) < '2021-09-20 00:00:00':
-        d.append(0)
-    else: d.append(1)
-benchmark['Dummy'] = d
 
-''' Calculating the systmatic risk.
+''' Calculating the systmatic risk after the inclusion AND exclusion of the Stocks in the DAX.
 To estimate the regression equations, OLS was used in conjunction with a correction procedure (Newey/West) 
 for serially correlated error terms. 
 This approach leads to test statistics that are robust against autocorrelated and 
@@ -221,7 +41,7 @@ heteroskedastic disturbance terms.
 
 Time Horizon
 ----------
-Start: 1 Year before the inclusion day (2020-09-20)
+Start: 2009-06-21
 End: 2022-03-01
 ----------
 
@@ -235,33 +55,49 @@ Parameters
     R^2: R-squared of the model.
 -------
 '''
-i = 1
-sys_risk = []
-for key in dax_new:
-    data = pd.DataFrame(dax_new[key]['2020-09-20':'2022-03-01'])
-    data['Benchmark'] = benchmark['Schlusskurs']['2020-09-20':'2022-03-01']
-    data['Dummy'] = benchmark['Dummy']['2020-09-20':'2022-03-01']
-    #stocks_as_df['Volume'][key]['2020-09-20':'2021-09-20']    
-    data = data.rename(columns = {f"{key} Return": 'y', 'Dummy': 'D', 'Benchmark': 'x'})
-    reg = smf.ols('y ~ x + D*x', data).fit(cov_type='HAC',cov_kwds={'maxlags':1})
-    sys_risk.append(
-        {
-            'Stock': key,
-            'Rank': i, 
-            r"$\Delta$": reg.params[3], 
-            'p_Value': reg.pvalues[3], 
-            r"$R^{2}$": reg.rsquared
-        }
-    )
-    i += 1
-sys_risk = pd.DataFrame(sys_risk)
-sys_risk.append(
-        {
-            'Stock': r"$\varnothing$",
-            r"$\Delta$": sys_risk[r"$\Delta$"].mean(),
-            r"$R^{2}$": sys_risk[r"$R^{2}$"].mean()
-        }, ignore_index=True
-    )
+def betas(ticker, returns):
+    i = 0
+    j = 1
+    sys_risk = []
+    while i in range(0,len(returns)):
+        d = []
+        for date in benchmark.index:
+            if str(date) < str(ticker.iloc[i][0]):
+                d.append(0)
+            else: d.append(1)
+        benchmark['Dummy'] = d
+
+        data = pd.DataFrame(returns[ticker.iloc[i][1]][(ticker.iloc[i][0] - datetime.timedelta(days=365)):(ticker.iloc[i][0] + datetime.timedelta(days=365))])
+        data['Benchmark'] = benchmark['Schlusskurs'][(ticker.iloc[i][0] - datetime.timedelta(days=365)):(ticker.iloc[i][0] + datetime.timedelta(days=365))]
+        data['Dummy'] = benchmark['Dummy'][(ticker.iloc[i][0] - datetime.timedelta(days=365)):(ticker.iloc[i][0] + datetime.timedelta(days=365))]
+        data = data.rename(columns = {f"{ticker.iloc[i][1]} Return": 'y', 'Dummy': 'D', 'Benchmark': 'x'})
+        reg = smf.ols('y ~ x + D*x', data).fit(cov_type='HAC',cov_kwds={'maxlags':1})
+        sys_risk.append(
+            {
+                'Stock': ticker.iloc[i][2],
+                'Rank': j, 
+                r"$\Delta$": reg.params[3], 
+                'p_Value': reg.pvalues[3], 
+                r"$R^{2}$": reg.rsquared
+            }
+        )
+        j += 1
+        i += 1
+
+    sys_risk = pd.DataFrame(sys_risk)
+    sys_riskplus = sys_risk.copy()
+    sys_risk = sys_risk.append(
+            {
+                'Stock': r"$\varnothing$",
+                r"$\Delta$": sys_risk[r"$\Delta$"].mean(),
+                r"$R^{2}$": sys_risk[r"$R^{2}$"].mean()
+            }, ignore_index=True
+        )
+    return sys_risk, sys_riskplus
+
+betas(DAX_included, returns_daily_included)
+betas(DAX_excluded, returns_daily_excluded)
+betas(DAX_ticker_new, dax_new)
 
 '''Distribution of the shares with a higher unit share in the DAX and all those with a weighting of < 1 %. 
 Parameters
@@ -272,6 +108,7 @@ Parameters
     R^2: Mean R-squared of the model.
 -------
 '''
+_, sys_risk = betas(DAX_ticker_new, dax_new)
 des_stat = []
 des_stat.append(
         {
