@@ -11,10 +11,10 @@ corr_df_list = []
 for s in unique_stocks:
     for t in info_df.loc[~info_df['Type'].isnull()].loc[info_df['Ticker'] == s]['Type']:
         temp_date = pd.to_datetime(info_df.loc[info_df['Ticker'] == s].loc[info_df['Type'] == t]['Date'].values[0])  # Change Date to Announcement if desired
-        temp_data_before = stockdata_df[s + ' Return'].loc[temp_date - np.timedelta64(365, 'D'):temp_date]
-        temp_data_after = stockdata_df[s + ' Return'].loc[temp_date:temp_date + np.timedelta64(365, 'D')]
-        temp_dax_before = stockdata_df['.GDAXI Return'].loc[temp_date - np.timedelta64(365, 'D'):temp_date]
-        temp_dax_after = stockdata_df['.GDAXI Return'].loc[temp_date:temp_date + np.timedelta64(365, 'D')]
+        temp_data_before = stockdata_df[s + ' Close'].loc[temp_date - np.timedelta64(365, 'D'):temp_date]
+        temp_data_after = stockdata_df[s + ' Close'].loc[temp_date:temp_date + np.timedelta64(365, 'D')]
+        temp_dax_before = stockdata_df['.GDAXI Close'].loc[temp_date - np.timedelta64(365, 'D'):temp_date]
+        temp_dax_after = stockdata_df['.GDAXI Close'].loc[temp_date:temp_date + np.timedelta64(365, 'D')]
         corr_before = temp_data_before.corr(temp_dax_before)
         corr_after = temp_data_after.corr(temp_dax_after)
         if pd.to_datetime(info_df.loc[info_df['Ticker'] == s].loc[info_df['Type'] == t]['Date'].values[0]) == np.datetime64('2021-09-20'):
