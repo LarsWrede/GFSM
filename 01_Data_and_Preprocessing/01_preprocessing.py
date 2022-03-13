@@ -1,5 +1,20 @@
 import pandas as pd
-from lib import dir_utils
+import getpass
+
+user = getpass.getuser()
+if user == 'dennisblaufuss':
+    local_git_link = '/Users/dennisblaufuss/Desktop/Uni/Repos/GFSM'
+if user == 'Lars':
+    local_git_link = '/Users/dennisblaufuss/Desktop/Uni/Repos/GFSM'
+if user == 'sophiemerl':
+    local_git_link = '/Users/sophiemerl/Desktop/GSFM/T10/GFSM'
+if user == 'nicol':
+    local_git_link = 'C:\\Users\\nicol\\git\\GFSM'
+if user == 'nicolaskepper':
+    local_git_link = '/Users/nicolaskepper/git/GFSM'
+if user == 'Phillip':  # lol
+    local_git_link = '/Users/dennisblaufuss/Desktop/Uni/Repos/GFSM'
+
 
 """Creating Info DataFrame
 * Joining all Stocks that where at some point in time after 2010 in the DAX.
@@ -29,7 +44,7 @@ announcements['Date'] = pd.to_datetime(announcements['Date'])
 info_df = info_df.join(announcements.set_index('Date')['Announcement'], on='Date')
 info_df['Announcement'] = pd.to_datetime(info_df['Announcement'])
 
-stockdata_df = pd.read_csv('https://raw.githubusercontent.com/LarsWrede/GFSM/main/01_Data_and_Preprocessing/stocks-historical-data.csv', sep=';')[1:]
+stockdata_df = pd.read_csv('https://raw.githubusercontent.com/LarsWrede/GFSM/main/01_Data_and_Preprocessing/stocks-historical-data.csv', sep=';')
 temp_list = list(stockdata_df.columns)
 temp_list.remove('Unnamed: 0')
 for header in temp_list:
@@ -44,7 +59,7 @@ for t in info_df['Ticker']:
     elif t == 'SRT':
         info_df['Ticker'].loc[info_df['Ticker'] == t] = 'SATG.DE'
     elif t == '^GD':
-        info_df['Ticker'].loc[info_df['Ticker'] == t] = 'XXX'
+        info_df['Ticker'].loc[info_df['Ticker'] == t] = '.GDAXI'
     elif t == 'HEN':
         info_df['Ticker'].loc[info_df['Ticker'] == t] = 'HNKG.DE'
     elif t == 'MRK':
@@ -54,7 +69,7 @@ for t in info_df['Ticker']:
             if t in header:
                 info_df['Ticker'].loc[info_df['Ticker'] == t] = header
 
-info_df.to_csv(dir_utils.get_local_git_uri() + '/01_Data_and_Preprocessing/info_df.csv')
+info_df.to_csv(local_git_link + '/01_Data_and_Preprocessing/info_df.csv')
 
 """Creating StockData DataFrame
 * All data is retrieved via Reuters.
@@ -76,6 +91,6 @@ stockdata_df.columns = new_header
 stockdata_df['Date'] = pd.to_datetime(stockdata_df['Date'], dayfirst=True)
 stockdata_df.set_index('Date', inplace=True)
 
-stockdata_df.to_csv(dir_utils.get_local_git_uri() + '/01_Data_and_Preprocessing/stockdata_df.csv')
+stockdata_df.to_csv(local_git_link + '/01_Data_and_Preprocessing/stockdata_df.csv')
 
 print('checkpoint')

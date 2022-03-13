@@ -31,7 +31,7 @@
 29,2021-09-20,SHL.DE,Siemens Healthineers AG,Included,2021-03-09,SHLG.DE
 30,2021-09-20,SY1.DE,Symrise AG,Included,2021-03-09,SY1G.DE
 31,2021-09-20,ZAL.DE,Zalando SE,Included,2021-03-09,ZALG.DE
-32,,^GDAXI,DAX,,,XXX
+32,,^GDAXI,DAX,,,.GDAXI
 33,,ADS.DE,adidas AG,,,ADSGn.DE
 34,,ALV.DE,Allianz SE,,,ALVG.DE
 35,,BAS.DE,BASF SE,,,BASFn.DE
@@ -42,12 +42,12 @@
 40,,DPW.DE,Deutsche Post AG,,,DPWGn.DE
 41,,DTE.DE,Deutsche Telekom AG,,,DTEGn.DE
 42,,EON.BR,E.ON SE,,,EONGn.DE
-43,,FME.DE,Fresenius Medical Care AG & Co. KGaA,,,FME
+43,,FME.DE,Fresenius Medical Care AG & Co. KGaA,,,FMEG.DE
 44,,FRE.DE,Fresenius SE & Co. KGaA,,,FREG.DE
 45,,HEN3.DE,Henkel AG & Co. KGaA ,,,HNKG.DE
 46,,IFX.DE,Infineon Technologies AG,,,IFXGn.DE
 47,,LIN.DE,Linde plc,,,LINI.DE
-48,,MBG.DE,Mercedes-Benz Group ,,,MBG
+48,,MBG.DE,Mercedes-Benz Group ,,,MBGn.DE
 49,,MRK.DE,MERCK Kommanditgesellschaft auf Aktien,,,MRCG.DE
 50,,MUV2.DE,Münchner Rückversicherungs-Gesellschaft,,,MUVGn.DE
 51,,RWE.DE,RWE AG,,,RWEG.DE
