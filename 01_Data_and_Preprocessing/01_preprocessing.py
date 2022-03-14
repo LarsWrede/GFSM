@@ -141,24 +141,70 @@ stockdata_df_splined.to_csv(local_git_link + '/01_Data_and_Preprocessing/stockda
 
 ### Plot
 
-max_returns = stockdata_df_splined['.GDAXI Return']
-max_returns.sort_values(ascending=False).head(1000)
-
+## Quick check
+#max_returns = stockdata_df_splined['.GDAXI Return']
+#max_returns.sort_values(ascending=False).head(1000)
 
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 
 stockdata_df_splined_plot = stockdata_df_splined
+info_df_plot = info_df
 
 stockdata_df_splined_plot['Date_str'] = stockdata_df_splined_plot.index.strftime('%m-%d-%Y')
-
-stockdata_df_splined_plot['GDAXI_adj'] = stockdata_df_splined['.GDAXI Return']
-
 stockdata_df_splined_plot['datetime'] = pd.to_datetime(stockdata_df_splined_plot['Date_str'])
 
-stockdata_df_splined_plot['GDAXI_adj'].values[stockdata_df_splined_plot['GDAXI_adj'].values > 5] = 1
+info_df_plot['datetime'] = pd.to_datetime(info_df_plot['Date'])
+info_df_plot['datetime_announcement'] = pd.to_datetime(info_df_plot['Announcement'])
 
+
+#stockdata_df_splined_plot['GDAXI_adj'].values[stockdata_df_splined_plot['GDAXI_adj'].values > 5] = 1
 
 fig, ax = plt.subplots()
-ax.plot('datetime', '.GDAXI Volume', data=stockdata_df_splined_plot, color = "mediumblue", linewidth=.1)
+ax2 = ax.twinx()
+ax2.plot('datetime', '.GDAXI Volume', data=stockdata_df_splined_plot, color='darkblue', label='DAX Volume', linewidth=.2)
+ax.plot('datetime', '.GDAXI Return', data=stockdata_df_splined_plot, color='darkgrey', label='DAX Return', linewidth=.2)
+
+# Major ticks every 12 months.
+fmt_year = mdates.MonthLocator(interval=12)
+ax.xaxis.set_major_locator(fmt_year)
+
+# Minor ticks every 3 months.
+fmt_month = mdates.MonthLocator(interval=3)
+ax.xaxis.set_minor_locator(fmt_month)
+
+# Text in the x axis will be displayed in 'YYYY-mm' format.
+ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
+ax.format_xdata = mdates.DateFormatter('%Y-%m')
+ax.grid(True)
+
+# Axes labeling
+ax.set_xlabel('Date')
+ax.set_ylabel('DAX Return', color='darkgrey')
+ax2.set_ylabel('DAX Volume', color='darkblue')
+plt.title("DAX")
+
+# Inclusions
+i = 0
+for date in info_df_plot['datetime']:
+    if info_df_plot['Type'][i] == 'Included':
+        plt.axvspan(info_df_plot['datetime'][i], info_df_plot['datetime'][i], color='green', alpha=0.8, lw=2.5)
+        plt.axvspan(info_df_plot['datetime_announcement'][i], info_df_plot['datetime_announcement'][i], color='green', alpha=0.2, lw=2.5)
+    i +=1 
+
+
+# Exclusion
+i = 0
+for date in info_df_plot['datetime']:
+    if info_df_plot['Type'][i] == 'Excluded':
+        plt.axvspan(info_df_plot['datetime_announcement'][i], info_df_plot['datetime_announcement'][i], color='red', alpha=0.2, lw=.75)
+        plt.axvspan(info_df_plot['datetime'][i], info_df_plot['datetime'][i], color='red', alpha=0.8, lw=.75)
+    i +=1 
+
+plt.axvspan(info_df_plot['datetime'][0], info_df_plot['datetime'][0], color='crimson', alpha=0.8, lw=2)
+# Rotates and right aligns the x labels, and moves the bottom of the
+# axes up to make room for them.
+
+fig.autofmt_xdate()
 
 plt.savefig('DAX_return.png')
