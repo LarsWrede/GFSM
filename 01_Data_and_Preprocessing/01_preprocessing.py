@@ -132,7 +132,7 @@ stockdata_df_splined['WDIG.H Volume'].interpolate(method='linear', inplace=True,
 ### Returns
 for header in list(stockdata_df_splined.columns):
     if 'Close' in header:
-        stockdata_df_splined[header[:-5] + 'Return'] = ((1 + stockdata_df_splined[header].pct_change()) ** 250) - 1
+        stockdata_df_splined[header[:-5] + 'Return'] = stockdata_df_splined[header].pct_change()#+ 1) ** 365 - 1
 
 stockdata_df_splined = stockdata_df_splined.reindex(sorted(stockdata_df_splined.columns), axis=1)
 
