@@ -138,3 +138,27 @@ stockdata_df_splined = stockdata_df_splined.reindex(sorted(stockdata_df_splined.
 
 ### save file to
 stockdata_df_splined.to_csv(local_git_link + '/01_Data_and_Preprocessing/stockdata_df.csv')
+
+### Plot
+
+max_returns = stockdata_df_splined['.GDAXI Return']
+max_returns.sort_values(ascending=False).head(1000)
+
+
+import matplotlib.pyplot as plt
+
+stockdata_df_splined_plot = stockdata_df_splined
+
+stockdata_df_splined_plot['Date_str'] = stockdata_df_splined_plot.index.strftime('%m-%d-%Y')
+
+stockdata_df_splined_plot['GDAXI_adj'] = stockdata_df_splined['.GDAXI Return']
+
+stockdata_df_splined_plot['datetime'] = pd.to_datetime(stockdata_df_splined_plot['Date_str'])
+
+stockdata_df_splined_plot['GDAXI_adj'].values[stockdata_df_splined_plot['GDAXI_adj'].values > 5] = 1
+
+
+fig, ax = plt.subplots()
+ax.plot('datetime', '.GDAXI Volume', data=stockdata_df_splined_plot, color = "mediumblue", linewidth=.1)
+
+plt.savefig('DAX_return.png')
