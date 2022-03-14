@@ -139,7 +139,7 @@ stockdata_df_splined = stockdata_df_splined.reindex(sorted(stockdata_df_splined.
 ### save file to
 stockdata_df_splined.to_csv(local_git_link + '/01_Data_and_Preprocessing/stockdata_df.csv')
 
-### Plot
+### Plot DAX
 
 ## Quick check
 #max_returns = stockdata_df_splined['.GDAXI Return']
@@ -180,9 +180,9 @@ ax.grid(True)
 
 # Axes labeling
 ax.set_xlabel('Date')
-ax.set_ylabel('DAX Return', color='darkgrey')
-ax2.set_ylabel('DAX Volume', color='darkblue')
-plt.title("DAX")
+ax.set_ylabel('Return', color='darkgrey')
+ax2.set_ylabel('Volume', color='darkblue')
+plt.title('DAX')
 
 # Inclusions
 i = 0
@@ -201,10 +201,61 @@ for date in info_df_plot['datetime']:
         plt.axvspan(info_df_plot['datetime'][i], info_df_plot['datetime'][i], color='red', alpha=0.8, lw=.75)
     i +=1 
 
-plt.axvspan(info_df_plot['datetime'][0], info_df_plot['datetime'][0], color='crimson', alpha=0.8, lw=2)
 # Rotates and right aligns the x labels, and moves the bottom of the
 # axes up to make room for them.
 
 fig.autofmt_xdate()
 
-plt.savefig('DAX_return.png')
+plt.savefig(local_git_link + '/01_Data_and_Preprocessing/00_Stock_Visualization/DAX.png')
+
+### Plot stocks
+
+for ticker in info_df_plot['Ticker']:
+    vol = ticker + ' Volume'
+    ret = ticker + ' Return'
+    name = info_df_plot[info_df_plot['Ticker']==ticker]['Firmenname'].reset_index(drop=True)[0]
+    
+    datetime = info_df_plot[info_df_plot['Ticker']==ticker]['datetime'].reset_index(drop=True)[0]
+
+    datetime_announcement = info_df_plot[info_df_plot['Ticker']==ticker]['datetime_announcement'].reset_index(drop=True)[0]
+
+    type_1 = info_df_plot[info_df_plot['Ticker']==ticker]['Type'].reset_index(drop=True)[0]
+    #type_2 = info_df_plot[info_df_plot['Ticker']==ticker]['Type'].reset_index(drop=True)[1]
+
+    fig, ax = plt.subplots()
+    ax2 = ax.twinx()
+    ax2.plot('datetime', vol, data=stockdata_df_splined_plot, color='darkblue', label=vol, linewidth=.2)
+    ax.plot('datetime', ret, data=stockdata_df_splined_plot, color='darkgrey', label=ret, linewidth=.2)
+
+    # Major ticks every 12 months.
+    fmt_year = mdates.MonthLocator(interval=12)
+    ax.xaxis.set_major_locator(fmt_year)
+
+    # Minor ticks every 3 months.
+    fmt_month = mdates.MonthLocator(interval=3)
+    ax.xaxis.set_minor_locator(fmt_month)
+
+    # Text in the x axis will be displayed in 'YYYY-mm' format.
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
+    ax.format_xdata = mdates.DateFormatter('%Y-%m')
+    ax.grid(True)
+
+    # Axes labeling
+    ax.set_xlabel('Date')
+    ax.set_ylabel('Return', color='darkgrey')
+    ax2.set_ylabel('Volume', color='darkblue')
+    plt.title(name + ' (' + ticker + ')')
+
+    # Inclusions
+    if datetime is not 'NaT':
+        if type_1 == 'Included':
+            plt.axvspan(pd.to_datetime(datetime), pd.to_datetime(datetime), color='green', alpha=0.8, lw=2.5)
+            plt.axvspan(pd.to_datetime(datetime_announcement), pd.to_datetime(datetime_announcement), color='green', alpha=0.2, lw=2.5)
+
+        if type_1 == 'Excluded':
+            plt.axvspan(pd.to_datetime(datetime), pd.to_datetime(datetime), color='red', alpha=0.8, lw=.75)
+            plt.axvspan(pd.to_datetime(datetime_announcement), pd.to_datetime(datetime_announcement), color='red', alpha=0.2, lw=.75)
+
+    fig.autofmt_xdate()
+
+    plt.savefig(local_git_link + '/01_Data_and_Preprocessing/00_Stock_Visualization/' + ticker + '.png')
