@@ -65,7 +65,7 @@ for t in timeframes:
 
 result_df = pd.DataFrame(result_df_list)
 result_df = result_df.T
-result_df.columns = ['Avg. Corr year (Date)', 'Avg. Corr quarter (Date)', 'Avg. Corr month (Date)', 'Avg. Corr year (Announcement)', 'Avg. Corr quarter (Announcement)', 'Avg. Corr month (Announcement)']
+result_df.columns = ['Avg. Delta year (Date)', 'Avg. Delta quarter (Date)', 'Avg. Delta month (Date)', 'Avg. Delta year (Announcement)', 'Avg. Delta quarter (Announcement)', 'Avg. Delta month (Announcement)']
 
 result_df.to_excel('corr_results.xlsx')
 # print(result_df)
