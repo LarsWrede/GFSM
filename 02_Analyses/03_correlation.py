@@ -72,11 +72,12 @@ for t in timeframes:
         _, total_inc_p = ttest_ind(corr_df.loc[corr_df['Type'] == 'Included']['cb_' + timeframe + '_' + type], corr_df.loc[corr_df['Type'] == 'Included']['ca_' + timeframe + '_' + type], equal_var=False)
         ex_corr = corr_df.loc[corr_df['Type'] == 'Excluded']['Delta_' + timeframe + '_' + type].mean()
         _, ex_p = ttest_ind(corr_df.loc[corr_df['Type'] == 'Excluded']['cb_' + timeframe + '_' + type], corr_df.loc[corr_df['Type'] == 'Excluded']['ca_' + timeframe + '_' + type], equal_var=False)
-        result_df_list.append({'Included': total_inc_corr, 'Included_p': total_inc_p, 'Included_40 ': big_inc_corr, 'Included_40_p': big_inc_p, 'Included_rest ': rest_inc_corr, 'Included_rest_p': rest_inc_p, 'Excluded ': ex_corr, 'Excluded_p': ex_p})
+        result_df_list.append({'Included': total_inc_corr, 'Included_40': big_inc_corr, 'Included_rest': rest_inc_corr, 'Excluded': ex_corr})
+        result_df_list.append({'Included': total_inc_p, 'Included_40': big_inc_p, 'Included_rest': rest_inc_p, 'Excluded': ex_p})
 
 result_df = pd.DataFrame(result_df_list)
 result_df = result_df.T
-result_df.columns = ['Avg. Delta year (Date)', 'Avg. Delta quarter (Date)', 'Avg. Delta month (Date)', 'Avg. Delta year (Announcement)', 'Avg. Delta quarter (Announcement)', 'Avg. Delta month (Announcement)']
+result_df.columns = ['Avg. Delta year (Date)', 'p_value', 'Avg. Delta quarter (Date)', 'p_value', 'Avg. Delta month (Date)', 'p_value', 'Avg. Delta year (Announcement)', 'p_value', 'Avg. Delta quarter (Announcement)', 'p_value', 'Avg. Delta month (Announcement)', 'p_value']
 
 result_df.to_excel('corr_results.xlsx')
 # print(result_df)
