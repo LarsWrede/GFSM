@@ -185,13 +185,13 @@ ax2.set_ylabel('Volume', color='darkblue')
 plt.title('DAX')
 
 # Inclusions
+# #Note: somehow the plot gets screwed if we put Inclusion and Exclusion in one Loop
 i = 0
 for date in info_df_plot['datetime']:
     if info_df_plot['Type'][i] == 'Included':
         plt.axvspan(info_df_plot['datetime'][i], info_df_plot['datetime'][i], color='green', alpha=0.8, lw=2.5)
         plt.axvspan(info_df_plot['datetime_announcement'][i], info_df_plot['datetime_announcement'][i], color='green', alpha=0.2, lw=2.5)
     i +=1 
-
 
 # Exclusion
 i = 0
@@ -213,14 +213,18 @@ plt.savefig(local_git_link + '/01_Data_and_Preprocessing/00_Stock_Visualization/
 for ticker in info_df_plot['Ticker']:
     vol = ticker + ' Volume'
     ret = ticker + ' Return'
+
     name = info_df_plot[info_df_plot['Ticker']==ticker]['Firmenname'].reset_index(drop=True)[0]
-    
     datetime = info_df_plot[info_df_plot['Ticker']==ticker]['datetime'].reset_index(drop=True)[0]
-
     datetime_announcement = info_df_plot[info_df_plot['Ticker']==ticker]['datetime_announcement'].reset_index(drop=True)[0]
+    type = info_df_plot[info_df_plot['Ticker']==ticker]['Type'].reset_index(drop=True)[0]
 
-    type_1 = info_df_plot[info_df_plot['Ticker']==ticker]['Type'].reset_index(drop=True)[0]
-    #type_2 = info_df_plot[info_df_plot['Ticker']==ticker]['Type'].reset_index(drop=True)[1]
+    duplicate = ticker in pd.concat(d for l, d in info_df_plot.groupby("Ticker") if len(d) > 1).values
+    if duplicate:
+        datetime_2 = info_df_plot[info_df_plot['Ticker']==ticker]['datetime'].reset_index(drop=True)[1]
+        datetime_announcement_2 = info_df_plot[info_df_plot['Ticker']==ticker]['datetime_announcement'].reset_index(drop=True)[1]
+        type_2 = info_df_plot[info_df_plot['Ticker']==ticker]['Type'].reset_index(drop=True)[1]
+    else: type_2 = 'None'
 
     fig, ax = plt.subplots()
     ax2 = ax.twinx()
@@ -248,13 +252,20 @@ for ticker in info_df_plot['Ticker']:
 
     # Inclusions
     if datetime is not 'NaT':
-        if type_1 == 'Included':
+        if type == 'Included':
             plt.axvspan(pd.to_datetime(datetime), pd.to_datetime(datetime), color='green', alpha=0.8, lw=2.5)
             plt.axvspan(pd.to_datetime(datetime_announcement), pd.to_datetime(datetime_announcement), color='green', alpha=0.2, lw=2.5)
+        if type_2 == 'Included':
+            plt.axvspan(pd.to_datetime(datetime_2), pd.to_datetime(datetime_2), color='green', alpha=0.8, lw=2.5)
+            plt.axvspan(pd.to_datetime(datetime_announcement_2), pd.to_datetime(datetime_announcement_2), color='green', alpha=0.2, lw=2.5)
 
-        if type_1 == 'Excluded':
+        if type == 'Excluded':
             plt.axvspan(pd.to_datetime(datetime), pd.to_datetime(datetime), color='red', alpha=0.8, lw=.75)
             plt.axvspan(pd.to_datetime(datetime_announcement), pd.to_datetime(datetime_announcement), color='red', alpha=0.2, lw=.75)
+        if type_2 == 'Excluded':
+            plt.axvspan(pd.to_datetime(datetime_2), pd.to_datetime(datetime_2), color='red', alpha=0.8, lw=.75)
+            plt.axvspan(pd.to_datetime(datetime_announcement_2), pd.to_datetime(datetime_announcement_2), color='red', alpha=0.2, lw=.75)    
+
 
     fig.autofmt_xdate()
 
