@@ -1,36 +1,36 @@
 ,Date,Symbol,Firmenname,Type,Announcement,Ticker
-0,2010-06-21,SZG.DE,Salzgitter AG,Excluded,2010-04-06,SZGG.DE
-1,2015-09-21,LXS.DE,LANXESS Aktiengesellschaft,Excluded,2015-03-09,LXSG.DE
+0,2010-06-21,SZG.DE,Salzgitter AG,Excluded,2010-06-04,SZGG.DE
+1,2015-09-21,LXS.DE,LANXESS Aktiengesellschaft,Excluded,2015-09-03,LXSG.DE
 2,2016-03-21,SDF.DE,K+S Aktiengesellschaft,Excluded,2016-03-03,SDFGn.DE
-3,2018-03-19,PSM.DE,ProSiebenSat.1 Media SE,Excluded,2018-05-03,PSMGn.DE
-4,2018-09-24,CBK.DE,Commerzbank AG,Excluded,2018-05-09,CBKG.DE
-5,2019-09-23,TKA.DE,thyssenkrupp AG,Excluded,2019-04-09,TKAG.DE
-6,2020-06-22,LHA.DE,Deutsche Lufthansa AG,Excluded,2020-04-06,LHAG.DE
+3,2018-03-19,PSM.DE,ProSiebenSat.1 Media SE,Excluded,2018-03-05,PSMGn.DE
+4,2018-09-24,CBK.DE,Commerzbank AG,Excluded,2018-09-05,CBKG.DE
+5,2019-09-23,TKA.DE,thyssenkrupp AG,Excluded,2019-09-04,TKAG.DE
+6,2020-06-22,LHA.DE,Deutsche Lufthansa AG,Excluded,2020-06-04,LHAG.DE
 7,2020-08-24,WDI.HM,Wirecard AG,Excluded,2020-08-19,WDIG.H
 8,2021-03-22,BEI.DE,Beiersdorf Aktiengesellschaft,Excluded,2021-03-03,BEIG.DE
 9,2021-10-29,DWNI.DE,Deutsche Wohnen SE,Excluded,2021-10-26,DWNG.DE
-10,2010-06-21,HEI.DE,HeidelbergCement AG,Included,2010-04-06,HEIG.DE
-11,2012-09-24,CON.DE,Continental Aktiengesellschaft,Included,2012-05-09,CONG.DE
-12,2012-09-24,LXS.DE,LANXESS Aktiengesellschaft,Included,2012-05-09,LXSG.DE
-13,2015-09-21,VNA.DE,Vonovia SE,Included,2015-03-09,VNAn.DE
+10,2010-06-21,HEI.DE,HeidelbergCement AG,Included,2010-06-04,HEIG.DE
+11,2012-09-24,CON.DE,Continental Aktiengesellschaft,Included,2012-09-05,CONG.DE
+12,2012-09-24,LXS.DE,LANXESS Aktiengesellschaft,Included,2012-09-05,LXSG.DE
+13,2015-09-21,VNA.DE,Vonovia SE,Included,2015-09-03,VNAn.DE
 14,2016-03-21,PSM.DE,ProSiebenSat.1 Media SE,Included,2016-03-03,PSMGn.DE
-15,2018-03-19,1COV.DE,Covestro AG,Included,2018-05-03,1COV.DE
-16,2018-09-24,WDI.HM,Wirecard AG,Included,2018-05-09,WDIG.H
-17,2019-09-23,MTX.DE,MTU Aero Engines AG,Included,2019-04-09,MTXGn.DE
-18,2020-06-22,DWNI.DE,Deutsche Wohnen SE,Included,2020-04-06,DWNG.DE
+15,2018-03-19,1COV.DE,Covestro AG,Included,2018-03-05,1COV.DE
+16,2018-09-24,WDI.HM,Wirecard AG,Included,2018-09-05,WDIG.H
+17,2019-09-23,MTX.DE,MTU Aero Engines AG,Included,2019-09-04,MTXGn.DE
+18,2020-06-22,DWNI.DE,Deutsche Wohnen SE,Included,2020-06-04,DWNG.DE
 19,2020-08-24,DHER.DE,Delivery Hero SE,Included,2020-08-19,DHER.DE
 20,2021-03-22,ENR.DE,Siemens Energy AG,Included,2021-03-03,ENR1n.DE
 21,2021-10-29,BEI.DE,Beiersdorf Aktiengesellschaft,Included,2021-10-26,BEIG.DE
-22,2021-09-20,AIR.DE,Airbus SE,Included,2021-03-09,AIRG.DE
-23,2021-09-20,BNR.DE,Brenntag SE,Included,2021-03-09,BNRGn.DE
-24,2021-09-20,HFG.DE,HelloFresh SE,Included,2021-03-09,HFGG.DE
-25,2021-09-20,POAHY,Porsche,Included,2021-03-09,PSHG_p.DE
-26,2021-09-20,PUM.DE,PUMA SE,Included,2021-03-09,PUMG.DE
-27,2021-09-20,QIA.DE,Qiagen,Included,2021-03-09,QIA.DE
-28,2021-09-20,SRT3.DE,Sartorius AG,Included,2021-03-09,SATG.DE
-29,2021-09-20,SHL.DE,Siemens Healthineers AG,Included,2021-03-09,SHLG.DE
-30,2021-09-20,SY1.DE,Symrise AG,Included,2021-03-09,SY1G.DE
-31,2021-09-20,ZAL.DE,Zalando SE,Included,2021-03-09,ZALG.DE
+22,2021-09-20,AIR.DE,Airbus SE,Included,2021-09-03,AIRG.DE
+23,2021-09-20,BNR.DE,Brenntag SE,Included,2021-09-03,BNRGn.DE
+24,2021-09-20,HFG.DE,HelloFresh SE,Included,2021-09-03,HFGG.DE
+25,2021-09-20,POAHY,Porsche,Included,2021-09-03,PSHG_p.DE
+26,2021-09-20,PUM.DE,PUMA SE,Included,2021-09-03,PUMG.DE
+27,2021-09-20,QIA.DE,Qiagen,Included,2021-09-03,QIA.DE
+28,2021-09-20,SRT3.DE,Sartorius AG,Included,2021-09-03,SATG.DE
+29,2021-09-20,SHL.DE,Siemens Healthineers AG,Included,2021-09-03,SHLG.DE
+30,2021-09-20,SY1.DE,Symrise AG,Included,2021-09-03,SY1G.DE
+31,2021-09-20,ZAL.DE,Zalando SE,Included,2021-09-03,ZALG.DE
 32,,^GDAXI,DAX,,,.GDAXI
 33,,ADS.DE,adidas AG,,,ADSGn.DE
 34,,ALV.DE,Allianz SE,,,ALVG.DE

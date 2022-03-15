@@ -39,10 +39,10 @@ info_df.reset_index(drop=True, inplace=True)
 
 announcements = pd.read_csv('https://raw.githubusercontent.com/LarsWrede/GFSM/main/01_Data_and_Preprocessing/Historical_Index_Compositions.csv', sep=';')
 announcements.rename(columns={'Date of change': 'Date', 'Date of announcement': 'Announcement'}, inplace=True)
-announcements['Date'] = pd.to_datetime(announcements['Date'])
+announcements['Date'] = pd.to_datetime(announcements['Date'], dayfirst=True)
+announcements['Announcement'] = pd.to_datetime(announcements['Announcement'], dayfirst=True) #Soph
 
 info_df = info_df.join(announcements.set_index('Date')['Announcement'], on='Date')
-info_df['Announcement'] = pd.to_datetime(info_df['Announcement'])
 
 stockdata_df = pd.read_csv('https://raw.githubusercontent.com/LarsWrede/GFSM/main/01_Data_and_Preprocessing/stocks-historical-data.csv', sep=';')[1:]
 temp_list = list(stockdata_df.columns)
