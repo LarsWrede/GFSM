@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from scipy.stats import ttest_ind
 
 info_df = pd.read_csv('https://raw.githubusercontent.com/LarsWrede/GFSM/main/01_Data_and_Preprocessing/info_df.csv')
 stockdata_df = pd.read_csv('https://raw.githubusercontent.com/LarsWrede/GFSM/main/01_Data_and_Preprocessing/stockdata_df.csv')
@@ -29,17 +30,23 @@ corr_df_list = []
 for s in unique_stocks:
     for t in info_df.loc[~info_df['Type'].isnull()].loc[info_df['Ticker'] == s]['Type']:
         cb_y_d, ca_y_d = stock_corr(s, t, 'Date', 'year')
+        _, p_y_d = ttest_ind(cb_y_d, ca_y_d, equal_var=False)
         cb_q_d, ca_q_d = stock_corr(s, t, 'Date', 'quarter')
+        _, p_q_d = ttest_ind(cb_q_d, ca_q_d, equal_var=False)
         cb_m_d, ca_m_d = stock_corr(s, t, 'Date', 'month')
+        _, p_m_d = ttest_ind(cb_m_d, ca_m_d, equal_var=False)
         cb_y_a, ca_y_a = stock_corr(s, t, 'Announcement', 'year')
+        _, p_y_a = ttest_ind(cb_y_a, ca_y_a, equal_var=False)
         cb_q_a, ca_q_a = stock_corr(s, t, 'Announcement', 'quarter')
+        _, p_q_a = ttest_ind(cb_q_a, ca_q_a, equal_var=False)
         cb_m_a, ca_m_a = stock_corr(s, t, 'Announcement', 'month')
+        _, p_m_a = ttest_ind(cb_m_a, ca_m_a, equal_var=False)
         if pd.to_datetime(info_df.loc[info_df['Ticker'] == s].loc[info_df['Type'] == t]['Date'].values[0]) == np.datetime64('2021-09-20'):
             big_inc = True
         else:
             big_inc = False
         corr_df_list.append({'Ticker': s, 'Type': t, '30 -> 40': big_inc
-                             , 'cb_y_d': cb_y_d, 'ca_y_d': ca_y_d, 'Delta_y_d': ca_y_d - cb_y_d
+                             , 'cb_y_d': cb_y_d, 'ca_y_d': ca_y_d, 'Delta_y_d': ca_y_d - cb_y_d    
                              , 'cb_q_d': cb_q_d, 'ca_q_d': ca_q_d, 'Delta_q_d': ca_q_d - cb_q_d
                              , 'cb_m_d': cb_m_d, 'ca_m_d': ca_m_d, 'Delta_m_d': ca_m_d - cb_m_d
                              , 'cb_y_a': cb_y_a, 'ca_y_a': ca_y_a, 'Delta_y_a': ca_y_a - cb_y_a
@@ -58,10 +65,14 @@ for t in timeframes:
     for ty in types:
         type = ty[:1]
         big_inc_corr = corr_df.loc[corr_df['30 -> 40']]['Delta_' + timeframe + '_' + type].mean()
+        _, big_inc_p = ttest_ind(corr_df.loc[corr_df['30 -> 40']]['cb_' + timeframe + '_' + type], corr_df.loc[corr_df['30 -> 40']]['ca_' + timeframe + '_' + type], equal_var=False)
         rest_inc_corr = corr_df.loc[corr_df['Type'] == 'Included'].loc[corr_df['30 -> 40'] == False]['Delta_' + timeframe + '_' + type].mean()
+        _, rest_inc_p = ttest_ind(corr_df.loc[corr_df['Type'] == 'Included'].loc[corr_df['30 -> 40'] == False]['cb_' + timeframe + '_' + type], corr_df.loc[corr_df['Type'] == 'Included'].loc[corr_df['30 -> 40'] == False]['ca_' + timeframe + '_' + type], equal_var=False)
         total_inc_corr = corr_df.loc[corr_df['Type'] == 'Included']['Delta_' + timeframe + '_' + type].mean()
+        _, total_inc_p = ttest_ind(corr_df.loc[corr_df['Type'] == 'Included']['cb_' + timeframe + '_' + type], corr_df.loc[corr_df['Type'] == 'Included']['ca_' + timeframe + '_' + type], equal_var=False)
         ex_corr = corr_df.loc[corr_df['Type'] == 'Excluded']['Delta_' + timeframe + '_' + type].mean()
-        result_df_list.append({'Included': total_inc_corr, 'Included 40 ': big_inc_corr, 'Included Rest ': rest_inc_corr, 'Excluded ': ex_corr})
+        _, ex_p = ttest_ind(corr_df.loc[corr_df['Type'] == 'Excluded']['cb_' + timeframe + '_' + type], corr_df.loc[corr_df['Type'] == 'Excluded']['ca_' + timeframe + '_' + type], equal_var=False)
+        result_df_list.append({'Included': total_inc_corr, 'Included_p': total_inc_p, 'Included_40 ': big_inc_corr, 'Included_40_p': big_inc_p, 'Included_rest ': rest_inc_corr, 'Included_rest_p': rest_inc_p, 'Excluded ': ex_corr, 'Excluded_p': ex_p})
 
 result_df = pd.DataFrame(result_df_list)
 result_df = result_df.T
