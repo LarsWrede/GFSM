@@ -248,7 +248,8 @@ def calc_return_table(inclusions, returns, year_ranges, event_type='Announcement
     return df
 
 volumes, prices, info = prep_dfs()
-inclusions = info[info['Type'] == 'Included']
+#inclusions = info[info['Type'] == 'Included']
+inclusions = info[info['Type'] == 'Excluded']
 #print(inclusions)
 """
 print(calc_vr(inclusions['Announcement'].iloc[0], 1, volumes, 'HEIG.DE', '.GDAXI'))
@@ -297,4 +298,4 @@ with pd.option_context('display.max_rows', None, 'display.max_columns', None):  
 #print(calc_mean_return_multiple_days(2010, 2012, inclusions, range(1, 6), prices))
 
 with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
-    print(calc_return_table(inclusions, prices, year_ranges, event_type='Announcement'))
+    print(calc_return_table(inclusions, prices, year_ranges, event_type='Date'))
