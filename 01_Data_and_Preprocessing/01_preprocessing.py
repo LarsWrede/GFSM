@@ -268,3 +268,48 @@ for ticker in info_df_plot['Ticker']:
     fig.autofmt_xdate()
 
     plt.savefig(local_git_link + '/01_Data_and_Preprocessing/00_Stock_Visualization/' + ticker + '.png')
+
+    
+import numpy as np
+import matplotlib.pyplot as plt
+import plotly.express as px
+import matplotlib as mpl
+from statsmodels.tsa.seasonal import seasonal_decompose
+mpl.rcParams['figure.figsize'] = (10, 8)
+mpl.rcParams['axes.grid'] = False
+
+info_df = pd.read_csv('https://raw.githubusercontent.com/LarsWrede/GFSM/main/01_Data_and_Preprocessing/info_df.csv')
+stockdata_df = pd.read_csv('https://raw.githubusercontent.com/LarsWrede/GFSM/main/01_Data_and_Preprocessing/stockdata_df.csv')
+stockdata_df['Date'] = pd.to_datetime(stockdata_df['Date'])
+stockdata_df.set_index('Date', inplace=True)
+unique_stocks = list(dict.fromkeys(list(info_df.loc[~info_df['Type'].isnull()]['Ticker'])))
+
+stockdata_df['Date'] = pd.to_datetime(stockdata_df['Date'], format='%Y-%m-%d')
+stockdata_df["Date"] = pd.to_datetime(stockdata_df["Date"])
+stockdata_df = stockdata_df.set_index('Date')
+
+o_dict = {new: stockdata_df[new + ' Return'] for new in info_df['Ticker'].tolist()}
+for key in o_dict:
+    result = seasonal_decompose(o_dict[key].dropna(),model='additive', period = 12, extrapolate_trend = 12)
+    x = result.resid.index
+    y = result.resid.values
+    for i in result.resid.values:
+        if -0.50 < i > 0.50:
+            j = np.where(result.resid.values == i)
+            Outlier.append(f"{result.resid.index[j][0]} {key}")
+            
+print(Outlier)
+
+fig = px.line(stockdata_df.reset_index(), x='Date', y='SZGG.DE Return')
+#slider
+fig.update_xaxes(
+    rangeslider_visible = True,
+    rangeselector = dict(
+        buttons = list([
+              dict(count=1, label='1y', step="year", stepmode="backward"),
+              dict(count=2, label='2y', step="year", stepmode="backward"),
+              dict(count=2, label='5y', step="year", stepmode="backward")
+        ])
+    )
+)
+fig.show()
