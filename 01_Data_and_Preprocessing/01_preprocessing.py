@@ -157,7 +157,6 @@ stockdata_df_splined_plot['datetime'] = pd.to_datetime(stockdata_df_splined_plot
 info_df_plot['datetime'] = pd.to_datetime(info_df_plot['Date'])
 info_df_plot['datetime_announcement'] = pd.to_datetime(info_df_plot['Announcement'])
 
-
 #stockdata_df_splined_plot['GDAXI_adj'].values[stockdata_df_splined_plot['GDAXI_adj'].values > 5] = 1
 
 fig, ax = plt.subplots()
@@ -265,7 +264,6 @@ for ticker in info_df_plot['Ticker']:
         if type_2 == 'Excluded':
             plt.axvspan(pd.to_datetime(datetime_2), pd.to_datetime(datetime_2), color='red', alpha=0.8, lw=.75)
             plt.axvspan(pd.to_datetime(datetime_announcement_2), pd.to_datetime(datetime_announcement_2), color='red', alpha=0.2, lw=.75)    
-
 
     fig.autofmt_xdate()
 
