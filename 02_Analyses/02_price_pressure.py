@@ -1,5 +1,3 @@
-import sys
-
 import pandas as pd
 from datetime import timedelta
 from datetime import datetime
@@ -200,11 +198,14 @@ def calc_volume_table(inclusions, stocks, market_symbol, year_ranges, event_type
         df = calc_and_append_with_index(df, y1, y2, inclusions, stocks, market_symbol, event_type,
                                         str(y1) if y1 == y2 else str(y1) + '-' + str(y2))
 
-    df = calc_and_append_with_index(df, 2021, 2021, inclusions[inclusions['Announcement'] == '2021-03-09'], stocks,
+    df = calc_and_append_with_index(df, 2021, 2021, inclusions[inclusions['Announcement'] == '2021-09-03'], stocks,
                                     market_symbol, event_type, 'DAX 30 -> 40')
 
-    df = calc_and_append_with_index(df, 2021, 2021, inclusions[inclusions['Announcement'] != '2021-03-09'], stocks,
-                                    market_symbol, event_type, 'Without 30 -> 40')
+    df = calc_and_append_with_index(df, 2021, 2021, inclusions[inclusions['Announcement'] != '2021-09-03'], stocks,
+                                    market_symbol, event_type, '2021 Without 30 -> 40')
+
+    df = calc_and_append_with_index(df, 2010, 2021, inclusions[inclusions['Announcement'] != '2021-09-03'], stocks,
+                                    market_symbol, event_type, 'All Without 30 -> 40')
 
     return df
 
@@ -240,16 +241,19 @@ def calc_return_table(inclusions, returns, year_ranges, event_type='Announcement
 
 
 
-    df = calc_and_append_with_index(df, 2021, 2021, inclusions[inclusions['Announcement'] == '2021-03-09'], returns,
+    df = calc_and_append_with_index(df, 2021, 2021, inclusions[inclusions['Announcement'] == '2021-09-03'], returns,
                                     event_type, 'DAX 30 -> 40')
 
-    df = calc_and_append_with_index(df, 2021, 2021, inclusions[inclusions['Announcement'] != '2021-03-09'], returns,
+    df = calc_and_append_with_index(df, 2021, 2021, inclusions[inclusions['Announcement'] != '2021-09-03'], returns,
+                                    event_type, '2021 Without 30 -> 40')
+
+    df = calc_and_append_with_index(df, 2010, 2021, inclusions[inclusions['Announcement'] != '2021-09-03'], returns,
                                     event_type, 'Without 30 -> 40')
     return df
 
 volumes, prices, info = prep_dfs()
-#inclusions = info[info['Type'] == 'Included']
-inclusions = info[info['Type'] == 'Excluded']
+inclusions = info[info['Type'] == 'Included']
+exclusions = info[info['Type'] == 'Excluded']
 #print(inclusions)
 """
 print(calc_vr(inclusions['Announcement'].iloc[0], 1, volumes, 'HEIG.DE', '.GDAXI'))
@@ -272,16 +276,6 @@ s, m, stdev, _ = calc_mvr_multiple_days(2010, 2022, inclusions, range(1, 6), vol
 t = scipy.stats.ttest_1samp(s, 1).statistic
 p = s.gt(1).sum() / s.size
 print(t, p)
-"""
-
-
-year_ranges = [(2010, 2021), (2010, 2015), (2016, 2021)]
-year_ranges += [(x, x) for x in range(2010, 2022)]
-
-volume_df = calc_volume_table(inclusions, volumes, '.GDAXI', year_ranges, event_type='Date')
-
-with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
-   print(volume_df)
 
 #print(inclusions['Date'])
 
@@ -296,6 +290,27 @@ with pd.option_context('display.max_rows', None, 'display.max_columns', None):  
 #print(calc_mean_return(2010, 2012, inclusions, 5, prices))
 
 #print(calc_mean_return_multiple_days(2010, 2012, inclusions, range(1, 6), prices))
+"""
+
+
+year_ranges = [(2010, 2021), (2010, 2015), (2016, 2021)]
+year_ranges += [(x, x) for x in range(2010, 2022)]
 
 with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
+    print('Inclusions\n--------------------------------------------')
+    print('Announcement Day')
+    print(calc_volume_table(inclusions, volumes, '.GDAXI', year_ranges, event_type='Announcement'))
+    print(calc_return_table(inclusions, prices, year_ranges, event_type='Announcement'))
+
+    print('Inclusion Day')
+    print(calc_volume_table(inclusions, volumes, '.GDAXI', year_ranges, event_type='Date'))
     print(calc_return_table(inclusions, prices, year_ranges, event_type='Date'))
+
+    print('Exclusions\n--------------------------------------------')
+    print('Announcement Day')
+    print(calc_volume_table(exclusions, volumes, '.GDAXI', year_ranges, event_type='Announcement'))
+    print(calc_return_table(exclusions, prices, year_ranges, event_type='Announcement'))
+
+    print('Exclusion Day')
+    print(calc_volume_table(exclusions, volumes, '.GDAXI', year_ranges, event_type='Date'))
+    print(calc_return_table(exclusions, prices, year_ranges, event_type='Date'))
