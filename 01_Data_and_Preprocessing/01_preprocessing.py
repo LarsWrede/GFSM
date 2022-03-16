@@ -289,6 +289,7 @@ stockdata_df['Date'] = pd.to_datetime(stockdata_df['Date'])
 stockdata_df = stockdata_df.set_index('Date')
 
 o_dict = {new: stockdata_df[new + ' Return'] for new in info_df['Ticker'].tolist()}
+Outlier = []
 for key in o_dict:
     result = seasonal_decompose(o_dict[key].dropna(),model='additive', period = 12, extrapolate_trend = 12)
     x = result.resid.index
