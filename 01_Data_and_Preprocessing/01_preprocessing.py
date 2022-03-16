@@ -285,7 +285,7 @@ stockdata_df.set_index('Date', inplace=True)
 unique_stocks = list(dict.fromkeys(list(info_df.loc[~info_df['Type'].isnull()]['Ticker'])))
 
 stockdata_df['Date'] = pd.to_datetime(stockdata_df['Date'], format='%Y-%m-%d')
-stockdata_df["Date"] = pd.to_datetime(stockdata_df["Date"])
+stockdata_df['Date'] = pd.to_datetime(stockdata_df['Date'])
 stockdata_df = stockdata_df.set_index('Date')
 
 o_dict = {new: stockdata_df[new + ' Return'] for new in info_df['Ticker'].tolist()}
