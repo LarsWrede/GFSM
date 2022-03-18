@@ -255,15 +255,15 @@ def calc_return_table(inclusions, returns, year_ranges, event_type='Announcement
     return df
 
 
-def calc_vola_table(inclusions, returns, year_ranges, event_type='Announcement'):
+def calc_vola_table(inclusions, returns, year_ranges, volatility_period, event_type='Announcement'):
     df = pd.DataFrame(
         columns=['N', 'Mean', 'STD', 't', 'p', '% > 0'])
 
     calc_p = lambda s: s.gt(0).sum() / s.size * 100
     t_test = lambda s: scipy.stats.ttest_1samp(s, 0)
 
-    def calc_and_append_with_index(df, y1, y2, inclusions, returns, event_type, index):
-        s, m, stdev, n = calc_mean_vola_change(inclusions, returns, y1, y2, event_type)
+    def calc_and_append_with_index(df, y1, y2, inclusions, returns, vola_period, event_type, index):
+        s, m, stdev, n = calc_mean_vola_change(inclusions, returns, y1, y2, vola_period, event_type)
         if n <= 1:
             return df
         t = t_test(s)
@@ -273,21 +273,21 @@ def calc_vola_table(inclusions, returns, year_ranges, event_type='Announcement')
         return df.append(pd.DataFrame(data=d, index=[index]))
 
     for (y1, y2) in year_ranges:
-        df = calc_and_append_with_index(df, y1, y2, inclusions, returns, event_type,
+        df = calc_and_append_with_index(df, y1, y2, inclusions, returns, volatility_period, event_type,
                                         str(y1) if y1 == y2 else str(y1) + '-' + str(y2))
 
     df = calc_and_append_with_index(df, 2021, 2021, inclusions[inclusions['Announcement'] == '2021-09-03'], returns,
-                                    event_type, 'DAX 30 -> 40')
+                                    volatility_period, event_type, 'DAX 30 -> 40')
 
     df = calc_and_append_with_index(df, 2021, 2021, inclusions[inclusions['Announcement'] != '2021-09-03'], returns,
-                                    event_type, '2021 Without 30 -> 40')
+                                    volatility_period, event_type, '2021 Without 30 -> 40')
 
     df = calc_and_append_with_index(df, 2010, 2021, inclusions[inclusions['Announcement'] != '2021-09-03'], returns,
-                                    event_type, 'Without 30 -> 40')
+                                    volatility_period, event_type, 'Without 30 -> 40')
     return df
 
 
-def calc_mean_vola_change(inclusions, returns, year_start, year_end, event_type='Announcement'):
+def calc_mean_vola_change(inclusions, returns, year_start, year_end, volatility_period=5, event_type='Announcement'):
     year_start = datetime.strptime('01.01.' + str(year_start), '%d.%m.%Y')
     year_end = datetime.strptime('31.12.' + str(year_end), '%d.%m.%Y')
 
@@ -296,13 +296,14 @@ def calc_mean_vola_change(inclusions, returns, year_start, year_end, event_type=
 
     vola_changes = inclusions_in_time_period.apply(lambda row: vola_change_before_to_after_event(returns,
                                                                                                  row['Ticker'],
-                                                                                                 row[event_type]),
+                                                                                                 row[event_type],
+                                                                                                 volatility_period),
                                                    axis=1)
 
     return vola_changes, vola_changes.mean(), vola_changes.std(), vola_changes.size
 
 
-def vola_change_before_to_after_event(returns, stock_symbol, event_date):
+def vola_change_before_to_after_event(returns, stock_symbol, event_date, volatility_period=5):
     """
 
     :param returns:
@@ -314,9 +315,8 @@ def vola_change_before_to_after_event(returns, stock_symbol, event_date):
     :return:
 
     """
-    vola_period = 80
 
-    i = returns[returns.index == event_date]['Date_Increment_ID'].iloc[0] + vola_period
+    i = returns[returns.index == event_date]['Date_Increment_ID'].iloc[0] + volatility_period
     end_date = returns[returns['Date_Increment_ID'] == i].index[0]
     i = returns[returns.index == event_date]['Date_Increment_ID'].iloc[0] + 1
     start_date = returns[returns['Date_Increment_ID'] == i].index[0]
@@ -325,7 +325,7 @@ def vola_change_before_to_after_event(returns, stock_symbol, event_date):
 
     i = returns[returns.index == event_date]['Date_Increment_ID'].iloc[0] - 1
     end_date = returns[returns['Date_Increment_ID'] == i].index[0]
-    i = returns[returns.index == event_date]['Date_Increment_ID'].iloc[0] - vola_period
+    i = returns[returns.index == event_date]['Date_Increment_ID'].iloc[0] - volatility_period
     start_date = returns[returns['Date_Increment_ID'] == i].index[0]
 
     vola_before_event = calc_volatility(returns[stock_symbol], start_date, end_date)
@@ -348,9 +348,45 @@ def calc_volatility(returns, date_start, date_end):
     return prices_in_time_frame.std()
 
 
+def calc_and_print_all_tables(volumes, returns, info):
+    inclusions = info[info['Type'] == 'Included']
+    exclusions = info[info['Type'] == 'Excluded']
+
+    year_ranges = [(2010, 2021), (2010, 2015), (2016, 2021)]
+    year_ranges += [(x, x) for x in range(2010, 2022)]
+
+    with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
+        print('\nVolumes and returns')
+        print('Inclusions\n--------------------------------------------')
+        print('Announcement Day')
+        print(calc_volume_table(inclusions, volumes, '.GDAXI', year_ranges, event_type='Announcement'))
+        print(calc_return_table(inclusions, returns, year_ranges, event_type='Announcement'))
+
+        print('Inclusion Day')
+        print(calc_volume_table(inclusions, volumes, '.GDAXI', year_ranges, event_type='Date'))
+        print(calc_return_table(inclusions, returns, year_ranges, event_type='Date'))
+
+        print('\n\nExclusions\n--------------------------------------------')
+        print('Announcement Day')
+        print(calc_volume_table(exclusions, volumes, '.GDAXI', year_ranges, event_type='Announcement'))
+        print(calc_return_table(exclusions, returns, year_ranges, event_type='Announcement'))
+
+        print('Exclusion Day')
+        print(calc_volume_table(exclusions, volumes, '.GDAXI', year_ranges, event_type='Date'))
+        print(calc_return_table(exclusions, returns, year_ranges, event_type='Date'))
+
+    for i in [5, 80]:
+        print('\n\nVolatility - ', i, ' day period')
+        print('Inclusions\n--------------------------------------------')
+        print(calc_vola_table(inclusions, returns, year_ranges, i, 'Announcement'))
+        print(calc_vola_table(inclusions, returns, year_ranges, i, 'Date'))
+
+        print('Exclusions\n--------------------------------------------')
+        print(calc_vola_table(exclusions, returns, year_ranges, i, 'Announcement'))
+        print(calc_vola_table(exclusions, returns, year_ranges, i, 'Date'))
+
 volumes, returns, close, info = prep_dfs()
-inclusions = info[info['Type'] == 'Included']
-exclusions = info[info['Type'] == 'Excluded']
+
 # print(inclusions)
 """
 print(calc_vr(inclusions['Announcement'].iloc[0], 1, volumes, 'HEIG.DE', '.GDAXI'))
@@ -389,37 +425,6 @@ print(t, p)
 #print(calc_mean_return_multiple_days(2010, 2012, inclusions, range(1, 6), prices))
 """
 
-year_ranges = [(2010, 2021), (2010, 2015), (2016, 2021)]
-year_ranges += [(x, x) for x in range(2010, 2022)]
-"""
-with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
-    print('Inclusions\n--------------------------------------------')
-    print('Announcement Day')
-    print(calc_volume_table(inclusions, volumes, '.GDAXI', year_ranges, event_type='Announcement'))
-    print(calc_return_table(inclusions, returns, year_ranges, event_type='Announcement'))
 
-    print('Inclusion Day')
-    print(calc_volume_table(inclusions, volumes, '.GDAXI', year_ranges, event_type='Date'))
-    print(calc_return_table(inclusions, returns, year_ranges, event_type='Date'))
+calc_and_print_all_tables(volumes, returns, info)
 
-    print('Exclusions\n--------------------------------------------')
-    print('Announcement Day')
-    print(calc_volume_table(exclusions, volumes, '.GDAXI', year_ranges, event_type='Announcement'))
-    print(calc_return_table(exclusions, returns, year_ranges, event_type='Announcement'))
-
-    print('Exclusion Day')
-    print(calc_volume_table(exclusions, volumes, '.GDAXI', year_ranges, event_type='Date'))
-    print(calc_return_table(exclusions, returns, year_ranges, event_type='Date'))
-"""
-
-#print(calc_vola_table(inclusions, returns, year_ranges, 'Announcement'))
-#print(calc_vola_table(inclusions, returns, year_ranges, 'Date'))
-#
-#print('Exclusions\n--------------------------------------------')
-#print(calc_vola_table(exclusions, returns, year_ranges, 'Announcement'))
-#print(calc_vola_table(exclusions, returns, year_ranges, 'Date'))
-
-
-#print(returns[returns.index=='2021-09-20'])
-
-print(calc_vr(exclusions[exclusions['Ticker'] == 'WDIG.H']['Date'].values[0], 1, volumes, 'WDIG.H', '.GDAXI'))
