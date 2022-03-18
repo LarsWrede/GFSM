@@ -1,10 +1,23 @@
 # Index Revisions and Stock Returns
 
-We are currently working on an analysis of the explanations—price pressure, downward-sloping demand curves, improved liquidity, improved operating performance, 
-and increased investor awareness for the increase in stock value associated with new inclusions in the DAX30 Index.
+Based on previous work regarding inclusion effects in the S&P500, we analysed the German DAX to see if the same effects can also be observed. Our analysis addresses the inclusion effects of three areas: short term effects, market correlation and systematic risk.
 
-## The database
 
-We collected all stocks that were listed in DAX at some point after 2010 (https://www.dax-indices.com/document/Resources/Guides/Historical_Index_Compositions_20.12.2021.pdf). The data was retrieved from Reuters for 50 stocks incl. the DAX itself between January 1st 2008 and March 1st 2022.
+### The Database
+
+Historical data of all companies in the DAX from 01.01.2008 until 01.03.2022. Inclusion and exclusion information was obtained from the Deutsche Börse. Data was interpolated and scanned for outliers.
+
+### Short Term Effects
+
+Trading volume increases after an addition to the DAX. In contrast to our expectations returns and return volatility did not increase. However, these results should be treated with care since the small sample size might be a reason for non significant results.
+
+
+### Market Correlation
+
+We analysed the change in correlation of every stock with the market for their inclusion/exclusion and announcement date, being aware that multicollinearity affects our results. Due to the small sample size we could not detect any reasonable effects.
+
+### Systematic Risk
+
+After analysing the systematic risk for DAX stocks that were included/excluded from the index, we can confirm previous findings regarding the increase/decrease in the β-coefficients. Especially after the DAX30 to DAX40 increase, we see a steep increase in beta. 
 
 ---
